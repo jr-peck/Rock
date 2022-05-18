@@ -97,8 +97,12 @@ const FlowNodeDiagramLevel = defineComponent({ // eslint-disable-line @typescrip
     },
 
     setup(props, { emit }) {
+        const visibleNodes = computed(() => {
+            return props.levelData.filter(node => node.height > 0);
+        });
+
         // Construct path dimensions and coordinates for a flow
-        function flowPoints ({sourcePoint, targetPoint, thickness}: FlowDiagramInFlow): string {
+        function flowPoints({ sourcePoint, targetPoint, thickness }: FlowDiagramInFlow): string {
             const oneThirdX = round((targetPoint.x - sourcePoint.x) / 3) + sourcePoint.x;
             const twoThirdsX = round((targetPoint.x - sourcePoint.x) * 2 / 3) + sourcePoint.x;
             const sourceBottom = sourcePoint.y + thickness;
@@ -115,7 +119,7 @@ const FlowNodeDiagramLevel = defineComponent({ // eslint-disable-line @typescrip
         }
 
         // Calculate the rotation transformation for the text label of the given node
-        function textTransform ({x, y}: Point): string {
+        function textTransform({ x, y }: Point): string {
             return `rotate(-90, ${x - 6}, ${y})`;
         }
 
@@ -127,27 +131,33 @@ const FlowNodeDiagramLevel = defineComponent({ // eslint-disable-line @typescrip
             return `edge node-${flow.sourceId} node-${flow.targetId} level-${props.levelNumber - 1}_${props.levelNumber}`;
         }
 
-        function onHover (flow: FlowDiagramInFlow, e: MouseEvent): void {
+        function onHoverFlow(flow: FlowDiagramInFlow, e: MouseEvent): void {
             emit("showTooltip", flow.tooltip, e);
         }
 
-        function onUnHover (): void {
+        function onHoverNode(node: FlowDiagramLevelNode, e: MouseEvent): void {
+            emit("showTooltip", `<strong>${node.name}</strong><br>Total Steps Taken: ${node.totalUnits}`, e);
+        }
+
+        function onUnHover(): void {
             emit("showTooltip");
         }
 
         return {
+            visibleNodes,
             flowPoints,
             textTransform,
             nodeClass,
             flowClass,
-            onHover,
+            onHoverFlow,
+            onHoverNode,
             onUnHover
         };
     },
 
     template: `
 <g v-if="levelNumber == 1">
-    <text v-for="node in levelData" key="node.id + 'text'" :x="node.x - 6" :y="node.y" :transform="textTransform(node)" dx="-3" font-size="12" text-anchor="end">
+    <text v-for="node in visibleNodes" key="node.id + 'text'" :x="node.x - 6" :y="node.y" :transform="textTransform(node)" dx="-3" font-size="12" text-anchor="end">
         {{ node.name }}
     </text>
 </g>
@@ -159,7 +169,7 @@ const FlowNodeDiagramLevel = defineComponent({ // eslint-disable-line @typescrip
             :d="flowPoints(flow)"
             fill="#AAAAAA"
             :fill-opacity="0.6"
-            @mousemove="onHover(flow, $event)"
+            @mousemove="onHoverFlow(flow, $event)"
             @mouseout="onUnHover"
             :class="flowClass(flow)"
         ></path>
@@ -174,6 +184,8 @@ const FlowNodeDiagramLevel = defineComponent({ // eslint-disable-line @typescrip
         :height="node.height"
         :fill="node.color"
         :class="nodeClass(node)"
+        @mousemove="onHoverNode(node, $event)"
+        @mouseout="onUnHover"
     ></rect>
 </g>
 `
@@ -262,7 +274,7 @@ export default defineComponent({
                 const levelFlows = props.flowEdges.filter(flow => flow.level == level);
 
                 // Total number of units flowing into this level.
-                const totalLevelUnits = levelFlows.reduce((tot, {units}) => tot + units, 0);
+                const totalLevelUnits = levelFlows.reduce((tot, { units }) => tot + units, 0);
 
                 if (level > 1) {
                     useableHeight = round(totalLevelUnits / previousTotalUnits * useableHeight);
@@ -329,7 +341,7 @@ export default defineComponent({
                     };
 
                     // Set up for the next node
-                    currentY += height + nodeVerticalSpacing;
+                    currentY += height + (height > 0 ? nodeVerticalSpacing : 0);
 
                     return levelNode;
                 });
@@ -353,7 +365,7 @@ export default defineComponent({
             side: "left"
         });
 
-        function showTooltip (html: string, e: MouseEvent): void {
+        function showTooltip(html: string, e: MouseEvent): void {
             if (html && e) {
                 tooltip.isShown = true;
                 tooltip.html = html;

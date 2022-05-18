@@ -44,6 +44,7 @@
     <Folder Include="src\Example\" />
     <Folder Include="src\Finance\" />
     <Folder Include="src\Groups\" />
+    <Folder Include="src\Steps\" />
     <Folder Include="src\Security\" />
     <Folder Include="src\Utility\" />
     <Folder Include="src\WorkFlow\" />
@@ -85,6 +86,9 @@
     <TypeScriptCompile Include="src\Finance\transactionEntry.ts" />
     <TypeScriptCompile Include="src\Groups\groupMemberList.ts" />
     <TypeScriptCompile Include="src\Security\login.ts" />
+    <TypeScriptCompile Include="src\Steps\stepFlow.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\Utility\starkDetail.ts" />
     <TypeScriptCompile Include="src\WorkFlow\FormBuilder\formBuilderDetail.ts" />
     <TypeScriptCompile Include="src\WorkFlow\FormBuilder\FormBuilderDetail\communicationsTab.ts" />
