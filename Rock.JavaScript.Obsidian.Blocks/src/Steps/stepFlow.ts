@@ -86,6 +86,13 @@ export default defineComponent({
             ...configurationValues.campuses
         ]);
 
+        const settings = ref({
+            nodeWidth: 40,
+            nodeVerticalSpacing: 50,
+            nodeHorizontalSpacing: 100,
+            chartHeight: 500
+        });
+
         // #endregion
 
         // #region Computed Values
@@ -134,6 +141,7 @@ export default defineComponent({
             maxLevels,
             campus,
             campusOptions,
+            settings,
             fetchData
         };
     },
@@ -154,7 +162,7 @@ export default defineComponent({
             </div>
         </RockForm>
 
-        <FlowNodeDiagram :flowNodes="flowNodes" :flowEdges="flowEdges" :isLoading="isLoading" />
+        <FlowNodeDiagram :flowNodes="flowNodes" :flowEdges="flowEdges" :isLoading="isLoading" :settings="settings" />
     </template>
 </Block>`
     // #endregion
