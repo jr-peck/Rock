@@ -38,14 +38,48 @@ namespace Rock.Blocks.Steps
     [Description( "Show the flow of individuals as they move through the four step types in the Discipleship Path program." )]
     [IconCssClass( "fa fa-users" )]
 
+    #region Block Attributes
+
+    [IntegerField(
+        "Node Width",
+        Key = AttributeKey.NodeWidth,
+        Description = "How many pixels wide should the nodes be?",
+        DefaultValue = "12",
+        Order = 1 )]
+
+    [IntegerField(
+        "Node Vertical Spacing",
+        Key = AttributeKey.NodeVerticalSpacing,
+        Description = "How many pixels should separate the nodes vertically?",
+        DefaultValue = "12",
+        Order = 2 )]
+
+    [IntegerField(
+        "Node Horizontal Spacing",
+        Key = AttributeKey.NodeHorizontalSpacing,
+        Description = "How many pixels wide should the flow paths be between the nodes?",
+        DefaultValue = "200",
+        Order = 3 )]
+
+    [IntegerField(
+        "Chart Height",
+        Key = AttributeKey.ChartHeight,
+        Description = "How many tall should the chart be (in pixels)?",
+        DefaultValue = "900",
+        Order = 4 )]
+
+    #endregion Block Attributes
+
     public class StepFlow : RockObsidianBlockType
     {
         #region Attribute Keys
 
         private static class AttributeKey
         {
-            public const string ShowEmailAddress = "ShowEmailAddress";
-            public const string Email = "Email";
+            public const string NodeWidth = "NodeWidth";
+            public const string NodeVerticalSpacing = "NodeVerticalSpacing";
+            public const string NodeHorizontalSpacing = "NodeHorizontalSpacing";
+            public const string ChartHeight = "ChartHeight";
         }
 
         #endregion Attribute Keys
@@ -81,7 +115,11 @@ namespace Rock.Blocks.Steps
 
             return new
             {
-                Campuses = Campuses
+                Campuses = Campuses,
+                NodeWidth = GetAttributeValue(AttributeKey.NodeWidth).AsInteger(),
+                NodeVerticalSpacing = GetAttributeValue(AttributeKey.NodeVerticalSpacing).AsInteger(),
+                NodeHorizontalSpacing = GetAttributeValue(AttributeKey.NodeHorizontalSpacing).AsInteger(),
+                ChartHeight = GetAttributeValue(AttributeKey.ChartHeight).AsInteger()
             };
         }
 

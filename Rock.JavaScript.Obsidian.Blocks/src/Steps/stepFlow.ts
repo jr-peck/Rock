@@ -25,13 +25,13 @@ import RockForm from "@Obsidian/Controls/rockForm";
 import DateRangePicker, { DateRangeParts } from "@Obsidian/Controls/dateRangePicker";
 import NumberBox from "@Obsidian/Controls/numberBox";
 import DropDownList from "@Obsidian/Controls/dropDownList";
-import FlowNodeDiagram, { FlowEdge, FlowNode } from "@Obsidian/Controls/flowNodeDiagram";
+import FlowNodeDiagram, { FlowEdge, FlowNode, FlowNodeDiagramSettings } from "@Obsidian/Controls/flowNodeDiagram";
 import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 import { emptyGuid } from "@Obsidian/Utility/guid";
 
 type ConfigurationValues = {
     campuses: ListItemBag[]
-};
+} & FlowNodeDiagramSettings;
 
 /**
  * Step Flow
@@ -87,10 +87,10 @@ export default defineComponent({
         ]);
 
         const settings = ref({
-            nodeWidth: 40,
-            nodeVerticalSpacing: 50,
-            nodeHorizontalSpacing: 100,
-            chartHeight: 500
+            nodeWidth: configurationValues.nodeWidth,
+            nodeVerticalSpacing: configurationValues.nodeVerticalSpacing,
+            nodeHorizontalSpacing: configurationValues.nodeHorizontalSpacing,
+            chartHeight: configurationValues.chartHeight
         });
 
         // #endregion

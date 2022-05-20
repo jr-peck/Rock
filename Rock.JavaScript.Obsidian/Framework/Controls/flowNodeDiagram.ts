@@ -259,7 +259,7 @@ export default defineComponent({
             const { nodeWidth, nodeHorizontalSpacing, nodeVerticalSpacing, chartHeight } = settings.value;
             const totalNodeVerticalGap = nodeVerticalSpacing * (nodeCount.value - 1);
             let previousTotalUnits = 0;
-            let useableHeight = chartHeight - totalNodeVerticalGap;
+            let useableHeight = chartHeight - totalNodeVerticalGap - 50; // The 50 gives some padding at the bottom for long labels
             let previousX = 0;
             let currentX = 24; // start with enough room for text labels
 
