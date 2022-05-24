@@ -95,14 +95,6 @@ export default defineComponent({
 
         // #endregion
 
-        // #region Computed Values
-
-        // #endregion
-
-        // #region Functions
-
-        // #endregion
-
         // #region Event Handlers
 
         async function fetchData(): Promise<void | boolean> {
@@ -113,9 +105,17 @@ export default defineComponent({
 
             isLoading.value = true;
 
+            // If 1900-01-01 is passed to `new Date`, it'll parse it as GMT (if single-digit month starting with a 0).
+            // If you change the separators to / instead, it'll be parsed in the current client's time zone, which is
+            // preferable, so we convert the dates here. Then we convert them to ISO Strings for the server.
+            const startDateString = (dateRange.value.lowerValue || "1900-01-01").replace("-", "/");
+            const startDate = new Date(startDateString).toISOString();
+            const endDateString = (dateRange.value.upperValue || "9999-01-01").replace("-", "/");
+            const endDate = new Date(endDateString).toISOString();
+
             const response = await invokeBlockAction<{ message: string; edges: FlowEdge[]; nodes: FlowNode[] }>("GetData", {
-                startDate: dateRange.value.lowerValue,
-                endDate: dateRange.value.upperValue,
+                startDate,
+                endDate,
                 maxLevels: maxLevels.value,
                 campus: campus.value,
             });

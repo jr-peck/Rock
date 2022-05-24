@@ -64,7 +64,7 @@ namespace Rock.Blocks.Steps
     [IntegerField(
         "Chart Height",
         Key = AttributeKey.ChartHeight,
-        Description = "How many tall should the chart be (in pixels)?",
+        Description = "How tall should the chart be (in pixels)?",
         DefaultValue = "900",
         Order = 4 )]
 
@@ -97,8 +97,6 @@ namespace Rock.Blocks.Steps
         private int currentColorIndex = 0;
         private string[] defaultColors = { "#ea5545", "#f46a9b", "#ef9b20", "#edbf33", "#ede15b", "#bdcf32", "#87bc45", "#27aeef", "#b33dc6" };
 
-
-
         #region Base Overrides
 
         /// <summary>
@@ -116,10 +114,10 @@ namespace Rock.Blocks.Steps
             return new
             {
                 Campuses = Campuses,
-                NodeWidth = GetAttributeValue(AttributeKey.NodeWidth).AsInteger(),
-                NodeVerticalSpacing = GetAttributeValue(AttributeKey.NodeVerticalSpacing).AsInteger(),
-                NodeHorizontalSpacing = GetAttributeValue(AttributeKey.NodeHorizontalSpacing).AsInteger(),
-                ChartHeight = GetAttributeValue(AttributeKey.ChartHeight).AsInteger()
+                NodeWidth = GetAttributeValue( AttributeKey.NodeWidth ).AsInteger(),
+                NodeVerticalSpacing = GetAttributeValue( AttributeKey.NodeVerticalSpacing ).AsInteger(),
+                NodeHorizontalSpacing = GetAttributeValue( AttributeKey.NodeHorizontalSpacing ).AsInteger(),
+                ChartHeight = GetAttributeValue( AttributeKey.ChartHeight ).AsInteger()
             };
         }
 
@@ -128,17 +126,16 @@ namespace Rock.Blocks.Steps
         #region Block Actions
 
         /// <summary>
-        /// Gets the data for the diagram
+        /// Block action to get the data for the diagram
         /// </summary>
-        /// <param name="startDate">The parameter from client.</param>
-        /// <param name="endDate">The parameter from client.</param>
-        /// <param name="maxLevels">The parameter from client.</param>
-        /// <param name="campus">The parameter from client.</param>
+        /// <param name="startDate">Filter dataset to only include steps that took place after this date.</param>
+        /// <param name="endDate">Filter dataset to only include steps that took place before this date.</param>
+        /// <param name="maxLevels">The maximum number of levels for any one person to complete</param>
+        /// <param name="campus">The campus where the steps take place</param>
         /// <returns></returns>
         [BlockAction]
-        public BlockActionResult GetData( string startDate, string endDate, int maxLevels, string campus )
+        public BlockActionResult GetData( DateTimeOffset startDate, DateTimeOffset endDate, int maxLevels, Guid campus )
         {
-            currentColorIndex = 0;
             List<StepTypeCache> stepTypes = StepProgramCache.Get( PageParameter( PageParameterKey.StepProgramId ).AsInteger() ).StepTypes;
             var nodeResults = new List<object>();
             int order = 0;
@@ -158,7 +155,7 @@ namespace Rock.Blocks.Steps
             var flowEdgeData = new DbService( new RockContext() ).GetDataTableFromSqlCommand( "spSteps_StepFlow", System.Data.CommandType.StoredProcedure, parameters );
             var flowEdgeResults = new List<object>();
 
-            foreach (DataRow flowEdgeRow in flowEdgeData.Rows)
+            foreach ( DataRow flowEdgeRow in flowEdgeData.Rows )
             {
                 int level = flowEdgeRow["Level"].ToIntSafe();
                 int units = flowEdgeRow["StepCount"].ToIntSafe();
@@ -167,14 +164,14 @@ namespace Rock.Blocks.Steps
 
                 var source = stepTypes.Find( stepType => stepType.Id == sourceId );
                 var target = stepTypes.Find( stepType => stepType.Id == targetId );
-                
+
                 flowEdgeResults.Add( new
                 {
                     Level = level,
                     SourceId = sourceId,
                     TargetId = targetId,
                     Units = units,
-                    Tooltip = level > 1 ? buildTooltip(source, target, units, flowEdgeRow["AvgNumberOfDaysBetweenSteps"].ToIntSafe() ) : ""
+                    Tooltip = level > 1 ? buildTooltip( source, target, units, flowEdgeRow["AvgNumberOfDaysBetweenSteps"].ToIntSafe() ) : ""
                 } );
             }
 
@@ -191,33 +188,33 @@ namespace Rock.Blocks.Steps
         /// <summary>
         /// Get the parameters dictionary for sending in to the DB query
         /// </summary>
-        /// <param name="MaxLevels">Depth Number of steps</param>
-        /// <param name="DateRangeStartDate"></param>
-        /// <param name="DateRangeEndDate"></param>
-        /// <param name="Campus">The campus where steps take place</param>
+        /// <param name="maxLevels">The maximum number of levels for any one person to complete</param>
+        /// <param name="dateRangeStartDate">Filter dataset to only include steps that took place after this date.</param>
+        /// <param name="dateRangeEndDate">Filter dataset to only include steps that took place before this date.</param>
+        /// <param name="campusGuid">The campus where the steps take place</param>
         /// <returns></returns>
-        private Dictionary<string, object> GetParameters( int MaxLevels, string DateRangeStartDate, string DateRangeEndDate, string Campus )
+        private Dictionary<string, object> GetParameters( int maxLevels, DateTimeOffset dateRangeStartDate, DateTimeOffset dateRangeEndDate, Guid campusGuid )
         {
             var parameters = new Dictionary<string, object>();
 
-            if (MaxLevels > 0)
+            if ( maxLevels > 0 )
             {
-                parameters.Add( "MaxLevels", MaxLevels );
+                parameters.Add( "MaxLevels", maxLevels );
             }
 
-            if ( DateRangeStartDate != null )
+            if ( dateRangeStartDate != null )
             {
-                parameters.Add( "DateRangeStartDate", DateTime.ParseExact( DateRangeStartDate, "yyyy-MM-dd", new CultureInfo( "en-US" ) ) );
+                parameters.Add( "DateRangeStartDate", dateRangeStartDate.DateTime );
             }
 
-            if ( DateRangeEndDate != null )
+            if ( dateRangeEndDate != null )
             {
-                parameters.Add( "DateRangeEndDate", DateTime.ParseExact( DateRangeEndDate, "yyyy-MM-dd", new CultureInfo( "en-US" ) ) );
+                parameters.Add( "DateRangeEndDate", dateRangeEndDate.DateTime );
             }
 
-            if ( Campus != null && new Guid(Campus) != Guid.Empty )
+            if ( campusGuid != null && campusGuid != Guid.Empty )
             {
-                parameters.Add( "CampusId", CampusCache.GetId( new Guid( Campus ) ) );
+                parameters.Add( "CampusId", CampusCache.GetId( campusGuid ) );
             }
             else
             {
@@ -232,7 +229,7 @@ namespace Rock.Blocks.Steps
 
         private string getNextDefaultColor()
         {
-            if (currentColorIndex >= defaultColors.Length)
+            if ( currentColorIndex >= defaultColors.Length )
             {
                 currentColorIndex = 0;
             }
@@ -240,7 +237,7 @@ namespace Rock.Blocks.Steps
             return defaultColors[currentColorIndex++];
         }
 
-        private string buildTooltip(StepTypeCache source, StepTypeCache target, int units, Nullable<int> days )
+        private string buildTooltip( StepTypeCache source, StepTypeCache target, int units, Nullable<int> days )
         {
             string dayString = days == null ? "Unknown" : $"{ days }";
 
