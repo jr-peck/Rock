@@ -646,7 +646,7 @@ namespace Rock.Rest.v2
                     {
                         Value = t.Guid.ToString(),
                         Text = t.Name,
-                        Category = t.Category.Name
+                        Category = t.Category?.Name
                     } )
                     .ToList();
 
