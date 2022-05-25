@@ -16,7 +16,6 @@
 //
 
 using System;
-using System.Globalization;
 using System.ComponentModel;
 using System.Data;
 using System.Collections.Generic;
@@ -24,6 +23,8 @@ using Rock.Attribute;
 using Rock.Model;
 using Rock.Data;
 using Rock.ViewModels.Utility;
+using Rock.ViewModels.Controls;
+using Rock.ViewModels.Blocks.Engagement.StepFlow;
 using Rock.Web.Cache;
 
 namespace Rock.Blocks.Steps
@@ -111,7 +112,7 @@ namespace Rock.Blocks.Steps
             var campusClientService = new Rock.ClientService.Core.Campus.CampusClientService( rockContext, RequestContext.CurrentPerson );
             Campuses = campusClientService.GetCampusesAsListItems();
 
-            return new
+            return new StepFlowInitializationBox
             {
                 Campuses = Campuses,
                 NodeWidth = GetAttributeValue( AttributeKey.NodeWidth ).AsInteger(),
@@ -137,23 +138,23 @@ namespace Rock.Blocks.Steps
         public BlockActionResult GetData( DateTimeOffset startDate, DateTimeOffset endDate, int maxLevels, Guid campus )
         {
             List<StepTypeCache> stepTypes = StepProgramCache.Get( PageParameter( PageParameterKey.StepProgramId ).AsInteger() ).StepTypes;
-            var nodeResults = new List<object>();
+            var nodeResults = new List<FlowNodeDiagramNodeBag>();
             int order = 0;
 
             foreach ( StepTypeCache step in stepTypes )
             {
-                nodeResults.Add( new
+                nodeResults.Add( new FlowNodeDiagramNodeBag
                 {
                     Id = step.Id,
                     Order = ++order,
                     Name = step.Name,
-                    Color = step.HighlightColor ?? getNextDefaultColor()
+                    Color = step.HighlightColor ?? GetNextDefaultColor()
                 } );
             }
 
             var parameters = GetParameters( maxLevels, startDate, endDate, campus );
             var flowEdgeData = new DbService( new RockContext() ).GetDataTableFromSqlCommand( "spSteps_StepFlow", System.Data.CommandType.StoredProcedure, parameters );
-            var flowEdgeResults = new List<object>();
+            var flowEdgeResults = new List<FlowNodeDiagramEdgeBag>();
 
             foreach ( DataRow flowEdgeRow in flowEdgeData.Rows )
             {
@@ -165,19 +166,18 @@ namespace Rock.Blocks.Steps
                 var source = stepTypes.Find( stepType => stepType.Id == sourceId );
                 var target = stepTypes.Find( stepType => stepType.Id == targetId );
 
-                flowEdgeResults.Add( new
+                flowEdgeResults.Add( new FlowNodeDiagramEdgeBag
                 {
-                    Level = level,
-                    SourceId = sourceId,
                     TargetId = targetId,
+                    SourceId = sourceId,
+                    Level = level,
                     Units = units,
-                    Tooltip = level > 1 ? buildTooltip( source, target, units, flowEdgeRow["AvgNumberOfDaysBetweenSteps"].ToIntSafe() ) : ""
-                } );
+                    Tooltip = level > 1 ? BuildTooltip( source, target, units, flowEdgeRow["AvgNumberOfDaysBetweenSteps"].ToIntSafe() ) : ""
+                });
             }
 
-            return ActionOk( new
+            return ActionOk( new StepFlowGetDataBag
             {
-                Parameters = parameters,
                 Edges = flowEdgeResults,
                 Nodes = nodeResults
             } );
@@ -227,7 +227,7 @@ namespace Rock.Blocks.Steps
             return parameters;
         }
 
-        private string getNextDefaultColor()
+        private string GetNextDefaultColor()
         {
             if ( currentColorIndex >= defaultColors.Length )
             {
@@ -237,7 +237,7 @@ namespace Rock.Blocks.Steps
             return defaultColors[currentColorIndex++];
         }
 
-        private string buildTooltip( StepTypeCache source, StepTypeCache target, int units, Nullable<int> days )
+        private string BuildTooltip( StepTypeCache source, StepTypeCache target, int units, int? days )
         {
             string dayString = days == null ? "Unknown" : $"{ days }";
 

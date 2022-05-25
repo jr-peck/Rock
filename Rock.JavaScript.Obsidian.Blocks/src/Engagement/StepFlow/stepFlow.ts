@@ -25,13 +25,14 @@ import RockForm from "@Obsidian/Controls/rockForm";
 import DateRangePicker, { DateRangeParts } from "@Obsidian/Controls/dateRangePicker";
 import NumberBox from "@Obsidian/Controls/numberBox";
 import DropDownList from "@Obsidian/Controls/dropDownList";
-import FlowNodeDiagram, { FlowEdge, FlowNode, FlowNodeDiagramSettings } from "@Obsidian/Controls/flowNodeDiagram";
+import FlowNodeDiagram from "./flowNodeDiagram";
 import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 import { emptyGuid } from "@Obsidian/Utility/guid";
-
-type ConfigurationValues = {
-    campuses: ListItemBag[]
-} & FlowNodeDiagramSettings;
+import { FlowNodeDiagramNodeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramNodeBag";
+import { FlowNodeDiagramEdgeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramEdgeBag";
+import { FlowNodeDiagramSettingsBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramSettingsBag";
+import { StepFlowInitializationBox } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/stepFlowInitializationBox";
+import { StepFlowGetDataBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/stepFlowGetDataBag";
 
 /**
  * Step Flow
@@ -65,11 +66,11 @@ export default defineComponent({
         // #region Variables
 
         const invokeBlockAction = useInvokeBlockAction();
-        const configurationValues = useConfigurationValues<ConfigurationValues>();
+        const configurationValues = useConfigurationValues<StepFlowInitializationBox>();
 
-        const flowNodes = ref<FlowNode[]>([]);
+        const flowNodes = ref<FlowNodeDiagramNodeBag[]>([]);
 
-        const flowEdges = ref<FlowEdge[]>([]);
+        const flowEdges = ref<FlowNodeDiagramEdgeBag[]>([]);
 
         const isLoading = ref(false);
 
@@ -83,10 +84,10 @@ export default defineComponent({
                 text: "All Campuses",
                 category: null
             },
-            ...configurationValues.campuses
+            ...(configurationValues.campuses ?? [])
         ]);
 
-        const settings = ref({
+        const settings = ref<FlowNodeDiagramSettingsBag>({
             nodeWidth: configurationValues.nodeWidth,
             nodeVerticalSpacing: configurationValues.nodeVerticalSpacing,
             nodeHorizontalSpacing: configurationValues.nodeHorizontalSpacing,
@@ -113,7 +114,7 @@ export default defineComponent({
             const endDateString = (dateRange.value.upperValue || "9999-01-01").replace("-", "/");
             const endDate = new Date(endDateString).toISOString();
 
-            const response = await invokeBlockAction<{ message: string; edges: FlowEdge[]; nodes: FlowNode[] }>("GetData", {
+            const response = await invokeBlockAction<StepFlowGetDataBag>("GetData", {
                 startDate,
                 endDate,
                 maxLevels: maxLevels.value,
@@ -123,8 +124,8 @@ export default defineComponent({
             isLoading.value = false;
 
             if (response.data) {
-                flowEdges.value = response.data.edges;
-                flowNodes.value = response.data.nodes;
+                flowEdges.value = response.data.edges ?? [];
+                flowNodes.value = response.data.nodes ?? [];
             }
             else {
                 throw new Error(response.errorMessage || "An error occurred");

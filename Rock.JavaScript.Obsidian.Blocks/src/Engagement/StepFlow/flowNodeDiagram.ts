@@ -18,43 +18,22 @@
 import { computed, defineComponent, PropType, reactive } from "vue";
 import { toDecimalPlaces } from "@Obsidian/Utility/numberUtils";
 
-export type FlowNode = {
-    id: number;
-    name: string;
-    color: string;
-    order: number;
-};
-
-export type FlowEdge = {
-    targetId: number;
-    sourceId: number | null;
-    level: number;
-    units: number;
-    tooltip: string;
-};
+import { FlowNodeDiagramNodeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramNodeBag";
+import { FlowNodeDiagramEdgeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramEdgeBag";
+import { FlowNodeDiagramSettingsBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramSettingsBag";
 
 type Point = { x: number; y: number };
 type Rectangle = Point & { width: number; height: number };
 type Path = { sourcePoint: Point, targetPoint: Point, thickness: number };
 
-type FlowDiagramInFlow = FlowEdge & Path;
-
-type FlowDiagramLevelNode = FlowNode & Rectangle & {
+type FlowDiagramInFlow = FlowNodeDiagramEdgeBag & Path;
+type FlowDiagramLevelNode = FlowNodeDiagramNodeBag & Rectangle & {
     totalUnits: number;
     inFlows: FlowDiagramInFlow[];
 };
 
 type FlowDiagramLevel = FlowDiagramLevelNode[];
-
 type FlowDiagramData = FlowDiagramLevel[];
-
-// All units are based on the SVG grid units.
-export type FlowNodeDiagramSettings = {
-    nodeWidth?: number; // The width of the nodes.
-    nodeVerticalSpacing?: number; // The vertical gap between the nodes
-    nodeHorizontalSpacing?: number; // The width of the gap between the node levels that the flows go through.
-    chartHeight?: number; // The viewBox height, also px height of SVG if not shrunk by too small of a container.
-};
 
 type FlowNodeDiagramSettingsFull = {
     nodeWidth: number;
@@ -203,19 +182,19 @@ export default defineComponent({
     props: {
         // Details about the nodes that are being "flowed" between.
         flowNodes: {
-            type: Array as PropType<FlowNode[]>,
+            type: Array as PropType<FlowNodeDiagramNodeBag[]>,
             default: () => []
         },
 
         // Details about flows between nodes
         flowEdges: {
-            type: Array as PropType<FlowEdge[]>,
+            type: Array as PropType<FlowNodeDiagramEdgeBag[]>,
             default: () => []
         },
 
         // Settings that control the sizes of different items in the diagram.
         settings: {
-            type: Object as PropType<FlowNodeDiagramSettings>,
+            type: Object as PropType<FlowNodeDiagramSettingsBag>,
             default: () => ({})
         },
 
@@ -227,7 +206,16 @@ export default defineComponent({
     },
 
     setup(props) {
-        const settings = computed<FlowNodeDiagramSettingsFull>(() => ({ ...defaultSettings, ...props.settings }));
+        const settings = computed<FlowNodeDiagramSettingsFull>(() => {
+            const settings = { ...defaultSettings };
+            Object.entries((key, value) => {
+                if (value !== undefined && value !== null) {
+                    settings[key] = value;
+                }
+            });
+
+            return settings;
+        });
         const nodeCount = computed(() => props.flowNodes.length);
         const levelsCount = computed(() => props.flowEdges.reduce((count, edge) => Math.max(count, edge.level), 0));
         const chartWidth = computed(() => {
@@ -286,7 +274,7 @@ export default defineComponent({
                 // Construct the base diagram nodes, which we'll fill in calculations for later.
                 const levelNodes: FlowDiagramLevel = orderedNodes.map(node => {
                     // Get the flows coming into this node and order them by the order of the source nodes
-                    const nodeInFlows: FlowEdge[] = levelFlows.filter(flow => flow.targetId == node.id).sort((flowA, flowB): number => {
+                    const nodeInFlows: FlowNodeDiagramEdgeBag[] = levelFlows.filter(flow => flow.targetId == node.id).sort((flowA, flowB): number => {
                         const nodeOrderA = orderedNodes.findIndex(node => node.id == flowA.sourceId);
                         const nodeOrderB = orderedNodes.findIndex(node => node.id == flowB.sourceId);
 
