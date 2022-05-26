@@ -18,8 +18,8 @@
 namespace Rock.ViewModels.Rest.Controls
 {
     /// <summary>
-    /// The options that can be passed to the GetEntityTypes API action of
-    /// the EntityTypePicker control.
+    /// The options that can be passed to the GetAchievementTypes API action of
+    /// the AchievementTypePicker control.
     /// </summary>
     public class AchievementTypePickerGetAchievementTypesOptionsBag
     {
