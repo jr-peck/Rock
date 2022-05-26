@@ -318,6 +318,7 @@
     <Compile Include="Controls\FieldTypeEditorUpdateAttributeConfigurationResultBag.cs" />
     <Compile Include="Reporting\FieldFilterSourceBag.cs" />
     <Compile Include="Rest\Controls\AuditDetailGetAuditDetailsOptionsBag.cs" />
+    <Compile Include="Rest\Controls\BadgeComponentPickerGetBadgeComponentsOptionsBag.cs" />
     <Compile Include="Rest\Controls\BadgeListGetBadgesOptionsBag.cs" />
     <Compile Include="Rest\Controls\CategoryPickerChildTreeItemsOptionsBag.cs" />
     <Compile Include="Rest\Controls\DefinedValuePickerGetDefinedValuesOptionsBag.cs" />
