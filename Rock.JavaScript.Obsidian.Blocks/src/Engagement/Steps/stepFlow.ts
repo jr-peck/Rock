@@ -25,14 +25,14 @@ import RockForm from "@Obsidian/Controls/rockForm";
 import DateRangePicker, { DateRangeParts } from "@Obsidian/Controls/dateRangePicker";
 import NumberBox from "@Obsidian/Controls/numberBox";
 import DropDownList from "@Obsidian/Controls/dropDownList";
-import FlowNodeDiagram from "./flowNodeDiagram";
+import FlowNodeDiagram from "./StepFlow/flowNodeDiagram";
 import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 import { emptyGuid } from "@Obsidian/Utility/guid";
-import { FlowNodeDiagramNodeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramNodeBag";
-import { FlowNodeDiagramEdgeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramEdgeBag";
-import { FlowNodeDiagramSettingsBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramSettingsBag";
-import { StepFlowInitializationBox } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/stepFlowInitializationBox";
-import { StepFlowGetDataBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/stepFlowGetDataBag";
+import { FlowNodeDiagramNodeBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/flowNodeDiagramNodeBag";
+import { FlowNodeDiagramEdgeBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/flowNodeDiagramEdgeBag";
+import { FlowNodeDiagramSettingsBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/flowNodeDiagramSettingsBag";
+import { StepFlowInitializationBox } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/stepFlowInitializationBox";
+import { StepFlowGetDataBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/stepFlowGetDataBag";
 
 /**
  * Step Flow

@@ -18,9 +18,9 @@
 import { computed, defineComponent, PropType, reactive } from "vue";
 import { toDecimalPlaces } from "@Obsidian/Utility/numberUtils";
 
-import { FlowNodeDiagramNodeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramNodeBag";
-import { FlowNodeDiagramEdgeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramEdgeBag";
-import { FlowNodeDiagramSettingsBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramSettingsBag";
+import { FlowNodeDiagramNodeBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/flowNodeDiagramNodeBag";
+import { FlowNodeDiagramEdgeBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/flowNodeDiagramEdgeBag";
+import { FlowNodeDiagramSettingsBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/flowNodeDiagramSettingsBag";
 
 type Point = { x: number; y: number };
 type Rectangle = Point & { width: number; height: number };

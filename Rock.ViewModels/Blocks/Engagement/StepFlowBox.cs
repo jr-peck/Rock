@@ -18,7 +18,7 @@
 using System.Collections.Generic;
 using Rock.ViewModels.Utility;
 
-namespace Rock.ViewModels.Blocks.Engagement.StepFlow
+namespace Rock.ViewModels.Blocks.Engagement.Steps
 {
     /// <summary>
     /// Box of properties for initializing the StepNode block

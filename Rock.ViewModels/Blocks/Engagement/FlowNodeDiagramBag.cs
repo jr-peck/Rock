@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Rock.ViewModels.Blocks.Engagement.StepFlow
+namespace Rock.ViewModels.Blocks.Engagement.Steps
 {
     /// <summary>
     /// Type for a Flow Node Diagram's Node definitions.

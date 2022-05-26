@@ -23,11 +23,10 @@ using Rock.Attribute;
 using Rock.Model;
 using Rock.Data;
 using Rock.ViewModels.Utility;
-using Rock.ViewModels.Controls;
-using Rock.ViewModels.Blocks.Engagement.StepFlow;
+using Rock.ViewModels.Blocks.Engagement.Steps;
 using Rock.Web.Cache;
 
-namespace Rock.Blocks.Steps
+namespace Rock.Blocks.Engagement.Steps
 {
     /// <summary>
     /// An example block.
@@ -35,9 +34,11 @@ namespace Rock.Blocks.Steps
     /// <seealso cref="Rock.Blocks.RockObsidianBlockType" />
 
     [DisplayName( "Step Flow" )]
-    [Category( "Obsidian > Steps" )]
+    [Category( "Steps" )]
     [Description( "Show the flow of individuals as they move through the four step types in the Discipleship Path program." )]
     [IconCssClass( "fa fa-users" )]
+    [Rock.SystemGuid.EntityTypeGuid( "308D8252-7712-4A45-8DE4-737C3EEAEA8F" )]
+    [Rock.SystemGuid.BlockTypeGuid( "2B4E0128-BCDF-48BF-AEC9-85001169DA3E" )]
 
     #region Block Attributes
 

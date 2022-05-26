@@ -21,8 +21,8 @@
 // </copyright>
 //
 
-import { FlowNodeDiagramEdgeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramEdgeBag";
-import { FlowNodeDiagramNodeBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepFlow/flowNodeDiagramNodeBag";
+import { FlowNodeDiagramEdgeBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/flowNodeDiagramEdgeBag";
+import { FlowNodeDiagramNodeBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/flowNodeDiagramNodeBag";
 
 export type StepFlowGetDataBag = {
     /** Gets or sets the list of edges */
