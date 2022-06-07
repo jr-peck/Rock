@@ -150,6 +150,8 @@
     <Compile Include="Entities\ContentChannelItemBag.cs" />
     <Compile Include="Entities\ContentChannelItemSlugBag.cs" />
     <Compile Include="Entities\ContentChannelTypeBag.cs" />
+    <Compile Include="Entities\ContentLibraryBag.cs" />
+    <Compile Include="Entities\ContentLibrarySourceBag.cs" />
     <Compile Include="Entities\DataViewBag.cs" />
     <Compile Include="Entities\DataViewFilterBag.cs" />
     <Compile Include="Entities\DefinedTypeBag.cs" />
