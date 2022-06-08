@@ -68,6 +68,10 @@
     <Compile Include="Migrations\202206071716185_AddContentLibrary.designer.cs">
       <DependentUpon>202206071716185_AddContentLibrary.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202206081855252_UpdateContentLibrary.cs" />
+    <Compile Include="Migrations\202206081855252_UpdateContentLibrary.designer.cs">
+      <DependentUpon>202206081855252_UpdateContentLibrary.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Version 13.0\Version 1.13.3\202203101710039_AddFormBuilderBlocksAndPages.cs" />
     <Compile Include="Migrations\Version 13.0\Version 1.13.3\202203101710039_AddFormBuilderBlocksAndPages.Designer.cs">
       <DependentUpon>202203101710039_AddFormBuilderBlocksAndPages.cs</DependentUpon>
@@ -1132,6 +1136,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202206071716185_AddContentLibrary.resx">
       <DependentUpon>202206071716185_AddContentLibrary.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206081855252_UpdateContentLibrary.resx">
+      <DependentUpon>202206081855252_UpdateContentLibrary.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\Version 13.0\Version 1.13.3\202203101710039_AddFormBuilderBlocksAndPages.resx">
       <DependentUpon>202203101710039_AddFormBuilderBlocksAndPages.cs</DependentUpon>

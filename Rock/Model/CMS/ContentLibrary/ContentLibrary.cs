@@ -145,7 +145,6 @@ namespace Rock.Model
         /// <value>
         /// The year search filter control.
         /// </value>
-        /// </value>
         [DataMember]
         public YearSearchFilterControl YearSearchFilterControl { get; set; }
 
@@ -155,9 +154,8 @@ namespace Rock.Model
         /// <value>
         /// The last index date time.
         /// </value>
-        [Required]
-        [DataMember( IsRequired = true )]
-        public DateTime LastIndexDateTime { get; set; }
+        [DataMember]
+        public DateTime? LastIndexDateTime { get; set; }
 
         /// <summary>
         /// Gets or sets the last index item count.
