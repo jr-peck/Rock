@@ -16,11 +16,14 @@
 //
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
 using System.Runtime.Serialization;
 using Rock.Data;
+using Rock.Lava;
 
 namespace Rock.Model
 {
@@ -167,7 +170,24 @@ namespace Rock.Model
         public int? LastIndexItemCount { get; set; }
 
         #endregion Entity Properties
+        #region Navigation Properties
 
+        /// <summary>
+        /// Gets or sets the content library sources.
+        /// </summary>
+        /// <value>
+        /// The content library sources.
+        /// </value>
+        [LavaVisible]
+        public virtual ICollection<ContentLibrarySource> ContentLibrarySources
+        {
+            get { return _contentLibrarySources ?? ( _contentLibrarySources = new Collection<ContentLibrarySource>() ); }
+            set { _contentLibrarySources = value; }
+        }
+
+        private ICollection<ContentLibrarySource> _contentLibrarySources;
+
+        #endregion Navigation Properties
         #region Methods
 
         /// <summary>

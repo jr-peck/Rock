@@ -119,7 +119,7 @@ namespace Rock.Model
         /// </summary>
         public ContentLibrarySourceConfiguration()
         {
-            this.HasRequired( c => c.ContentLibrary ).WithMany().HasForeignKey( c => c.ContentLibraryId ).WillCascadeOnDelete( true );
+            this.HasRequired( c => c.ContentLibrary ).WithMany( c => c.ContentLibrarySources ).HasForeignKey( c => c.ContentLibraryId ).WillCascadeOnDelete( true );
             this.HasRequired( c => c.EntityType ).WithMany().HasForeignKey( c => c.EntityTypeId ).WillCascadeOnDelete( false );
         }
     }
