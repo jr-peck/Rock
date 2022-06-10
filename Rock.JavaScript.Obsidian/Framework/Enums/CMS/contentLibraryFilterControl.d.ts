@@ -21,20 +21,20 @@
 // </copyright>
 //
 
-using Rock.Model;
-using Rock.SystemGuid;
+/**
+ * Defines the type of UI controls that can be rendered for filters
+ * on the content library pages.
+ */
+export const enum ContentLibraryFilterControl {
+    /**
+     * Filter will be rendered as a pill and will behave as either a
+     * radio button or checkbox.
+     */
+    Pills = 0,
 
-namespace Rock.Rest.Controllers
-{
-    /// <summary>
-    /// ContentLibrarySources REST API
-    /// </summary>
-    [RestControllerGuid( "73E391AA-8F89-4883-AEDC-7DA18C86EE98" )]
-    public partial class ContentLibrarySourcesController : Rock.Rest.ApiController<Rock.Model.ContentLibrarySource>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContentLibrarySourcesController"/> class.
-        /// </summary>
-        public ContentLibrarySourcesController() : base( new Rock.Model.ContentLibrarySourceService( new Rock.Data.RockContext() ) ) { } 
-    }
+    /** Filter will be rendered as a dropdown selection. */
+    Dropdown = 1,
+
+    /** Filter will be rendered as a single boolean option. */
+    Boolean = 2
 }

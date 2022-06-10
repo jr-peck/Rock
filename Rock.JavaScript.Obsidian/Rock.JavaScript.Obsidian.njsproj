@@ -96,6 +96,7 @@
     <Folder Include="Framework\ViewModels\Blocks\Groups\GroupScheduleSignup\" />
     <Folder Include="Framework\ViewModels\Blocks\Groups\GroupScheduleToolbox\" />
     <Folder Include="Framework\ViewModels\Blocks\Groups\GroupScheduleUnavailability\" />
+    <Folder Include="Framework\ViewModels\CMS\" />
     <Folder Include="Framework\ViewModels\Connection\" />
     <Folder Include="Framework\ViewModels\Controls\" />
     <Folder Include="Framework\ViewModels\CRM\" />
@@ -383,6 +384,9 @@
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Groups\GroupScheduleToolbox\contentBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Groups\GroupScheduleUnavailability\contentBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Groups\landingPageContentBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibarySourceAdditionalSettingsBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibraryAttributeFilterSettingsBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibraryFilterSettingsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Connection\connectionRequestCountsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Controls\addressControlBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Controls\birthdayPickerBag.d.ts" />
@@ -454,6 +458,8 @@
     <TypeScriptCompile Include="Framework\ViewModels\Entities\contentChannelItemBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Entities\contentChannelItemSlugBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Entities\contentChannelTypeBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Entities\contentLibraryBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Entities\contentLibrarySourceBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Entities\dataViewBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Entities\dataViewFilterBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Entities\definedTypeBag.d.ts" />

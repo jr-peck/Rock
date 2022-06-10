@@ -125,33 +125,6 @@ namespace Rock.Model
         public string FilterSettings { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether full text search should be enabled.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if [enable full text search]; otherwise, <c>false</c>.
-        /// </value>
-        [DataMember]
-        public bool FullTextSearchEnabled { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether year search should be enabled.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if [enable year search]; otherwise, <c>false</c>.
-        /// </value>
-        [DataMember]
-        public bool YearSearchEnabled { get; set; }
-
-        /// <summary>
-        /// Gets or sets the year search filter control.
-        /// </summary>
-        /// <value>
-        /// The year search filter control.
-        /// </value>
-        [DataMember]
-        public YearSearchFilterControl YearSearchFilterControl { get; set; }
-
-        /// <summary>
         /// Gets or sets the last index date time. This property is required.
         /// </summary>
         /// <value>
@@ -170,6 +143,7 @@ namespace Rock.Model
         public int? LastIndexItemCount { get; set; }
 
         #endregion Entity Properties
+
         #region Navigation Properties
 
         /// <summary>
@@ -188,6 +162,7 @@ namespace Rock.Model
         private ICollection<ContentLibrarySource> _contentLibrarySources;
 
         #endregion Navigation Properties
+
         #region Methods
 
         /// <summary>

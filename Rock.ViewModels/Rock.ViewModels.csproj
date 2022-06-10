@@ -88,6 +88,9 @@
     <Compile Include="Blocks\WorkFlow\FormBuilder\FormTemplateListItemViewModel.cs" />
     <Compile Include="Blocks\WorkFlow\FormBuilder\FormValueSourcesViewModel.cs" />
     <Compile Include="Blocks\Engagement\FlowNodeDiagramBag.cs" />
+    <Compile Include="CMS\ContentLibarySourceAdditionalSettingsBag.cs" />
+    <Compile Include="CMS\ContentLibraryAttributeFilterSettingsBag.cs" />
+    <Compile Include="CMS\ContentLibraryFilterSettingsBag.cs" />
     <Compile Include="Controls\ElectronicSignatureValueViewModel.cs" />
     <Compile Include="Controls\FieldTypeEditorGetAvailableFieldTypesOptionsBag.cs" />
     <Compile Include="CRM\RenderedBadgeBag.cs" />

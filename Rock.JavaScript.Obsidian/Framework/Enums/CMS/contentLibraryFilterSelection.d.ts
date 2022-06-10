@@ -21,20 +21,14 @@
 // </copyright>
 //
 
-using Rock.Model;
-using Rock.SystemGuid;
+/**
+ * Defines the selection type that can be used for filter controls when
+ * rendered on the content library pages.
+ */
+export const enum ContentLibraryFilterSelection {
+    /** A single item of this filter can be selected. */
+    Single = 0,
 
-namespace Rock.Rest.Controllers
-{
-    /// <summary>
-    /// ContentLibrarySources REST API
-    /// </summary>
-    [RestControllerGuid( "73E391AA-8F89-4883-AEDC-7DA18C86EE98" )]
-    public partial class ContentLibrarySourcesController : Rock.Rest.ApiController<Rock.Model.ContentLibrarySource>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContentLibrarySourcesController"/> class.
-        /// </summary>
-        public ContentLibrarySourcesController() : base( new Rock.Model.ContentLibrarySourceService( new Rock.Data.RockContext() ) ) { } 
-    }
+    /** Multiple items of this filter can be selected. */
+    Multiple = 1
 }

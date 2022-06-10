@@ -795,7 +795,6 @@
     <Compile Include="Jobs\PostV133DataMigrationsAddInteractionSessionLocationIndexToInteractionSession.cs" />
     <Compile Include="Model\CMS\ContentLibrarySource\ContentLibrarySource.cs" />
     <Compile Include="Model\CMS\ContentLibrary\ContentLibrary.cs" />
-    <Compile Include="Model\CMS\ContentLibrary\YearSearchFilterControl.cs" />
     <Compile Include="Model\CodeGenerated\ContentLibraryService.CodeGenerated.cs" />
     <Compile Include="Model\CodeGenerated\ContentLibrarySourceService.CodeGenerated.cs" />
     <Compile Include="Model\Core\InteractionChannel\InteractionChannelService.cs" />

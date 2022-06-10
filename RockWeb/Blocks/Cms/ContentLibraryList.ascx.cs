@@ -1,4 +1,4 @@
-﻿// <copyright>
+// <copyright>
 // Copyright by the Spark Development Network
 //
 // Licensed under the Rock Community License (the "License");
@@ -47,6 +47,7 @@ namespace RockWeb.Blocks.Cms
         Key = AttributeKey.DetailPage )]
 
     #endregion Block Attributes
+    [Rock.SystemGuid.BlockTypeGuid( "F305FE35-2EFA-4653-AA1A-87AE990EAFEB" )]
     public partial class ContentLibraryList : RockBlock, ISecondaryBlock
     {
         #region Attribute Keys

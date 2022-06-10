@@ -21,20 +21,24 @@
 // </copyright>
 //
 
-using Rock.Model;
-using Rock.SystemGuid;
+import { ContentLibraryFilterControl } from "@Obsidian/Enums/CMS/contentLibraryFilterControl";
+import { ContentLibraryFilterSelection } from "@Obsidian/Enums/CMS/contentLibraryFilterSelection";
+import { Guid } from "@Obsidian/Types";
 
-namespace Rock.Rest.Controllers
-{
-    /// <summary>
-    /// ContentLibrarySources REST API
-    /// </summary>
-    [RestControllerGuid( "73E391AA-8F89-4883-AEDC-7DA18C86EE98" )]
-    public partial class ContentLibrarySourcesController : Rock.Rest.ApiController<Rock.Model.ContentLibrarySource>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContentLibrarySourcesController"/> class.
-        /// </summary>
-        public ContentLibrarySourcesController() : base( new Rock.Model.ContentLibrarySourceService( new Rock.Data.RockContext() ) ) { } 
-    }
-}
+/** The settings for a single attribute filter configured on a content library. */
+export type ContentLibraryAttributeFilterSettingsBag = {
+    /**
+     * Gets or sets the attribute key to use when accessing values
+     * for this filter.
+     */
+    attributeKey?: Guid | null;
+
+    /** Gets or sets the label to use for the filter. */
+    label?: string | null;
+
+    /** Gets or sets the search filter control. */
+    filterControl: ContentLibraryFilterControl;
+
+    /** Gets or sets the selection type to use for the filter. */
+    filterSelection: ContentLibraryFilterSelection;
+};

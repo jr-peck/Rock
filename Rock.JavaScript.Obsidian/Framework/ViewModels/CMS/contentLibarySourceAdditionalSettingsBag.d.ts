@@ -21,20 +21,16 @@
 // </copyright>
 //
 
-using Rock.Model;
-using Rock.SystemGuid;
+import { Guid } from "@Obsidian/Types";
 
-namespace Rock.Rest.Controllers
-{
-    /// <summary>
-    /// ContentLibrarySources REST API
-    /// </summary>
-    [RestControllerGuid( "73E391AA-8F89-4883-AEDC-7DA18C86EE98" )]
-    public partial class ContentLibrarySourcesController : Rock.Rest.ApiController<Rock.Model.ContentLibrarySource>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContentLibrarySourcesController"/> class.
-        /// </summary>
-        public ContentLibrarySourcesController() : base( new Rock.Model.ContentLibrarySourceService( new Rock.Data.RockContext() ) ) { } 
-    }
-}
+/**
+ * The settings that describe additional details about a content library
+ * source that will be used during indexing.
+ */
+export type ContentLibarySourceAdditionalSettingsBag = {
+    /**
+     * Gets or sets the attribute unique identifiers that are included
+     * for indexing from this source.
+     */
+    attributeGuids?: Guid[] | null;
+};

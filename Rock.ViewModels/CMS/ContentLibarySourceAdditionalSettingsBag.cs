@@ -15,12 +15,24 @@
 // </copyright>
 //
 
-namespace Rock.Model
+using System;
+using System.Collections.Generic;
+
+namespace Rock.ViewModels.CMS
 {
     /// <summary>
-    /// Year Search Filter Control
+    /// The settings that describe additional details about a content library
+    /// source that will be used during indexing.
     /// </summary>
-    public enum YearSearchFilterControl
+    public class ContentLibarySourceAdditionalSettingsBag
     {
+        /// <summary>
+        /// Gets or sets the attribute unique identifiers that are included
+        /// for indexing from this source.
+        /// </summary>
+        /// <value>
+        /// The attribute unique identifiers that are included for indexing.
+        /// </value>
+        public List<Guid> AttributeGuids { get; set; }
     }
 }

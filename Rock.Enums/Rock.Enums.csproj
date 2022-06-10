@@ -46,6 +46,8 @@
     <Compile Include="..\Rock.Version\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
+    <Compile Include="CMS\ContentLibraryFilterControl.cs" />
+    <Compile Include="CMS\ContentLibraryFilterSelection.cs" />
     <Compile Include="CRM\Gender.cs" />
     <Compile Include="EnumDomainAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
