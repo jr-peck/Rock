@@ -68,6 +68,10 @@
     <Compile Include="Migrations\202206092326573_Rollup_0609.designer.cs">
       <DependentUpon>202206092326573_Rollup_0609.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202206121415348_AddDataViewSearchResultsAndReportSearchResultPages.cs" />
+    <Compile Include="Migrations\202206121415348_AddDataViewSearchResultsAndReportSearchResultPages.designer.cs">
+      <DependentUpon>202206121415348_AddDataViewSearchResultsAndReportSearchResultPages.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202206101556191_Rollup_0610.cs" />
     <Compile Include="Migrations\202206101556191_Rollup_0610.designer.cs">
       <DependentUpon>202206101556191_Rollup_0610.cs</DependentUpon>
@@ -1148,6 +1152,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202206092326573_Rollup_0609.resx">
       <DependentUpon>202206092326573_Rollup_0609.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206121415348_AddDataViewSearchResultsAndReportSearchResultPages.resx">
+      <DependentUpon>202206121415348_AddDataViewSearchResultsAndReportSearchResultPages.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202206101556191_Rollup_0610.resx">
       <DependentUpon>202206101556191_Rollup_0610.cs</DependentUpon>
