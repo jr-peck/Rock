@@ -562,16 +562,9 @@ namespace RockWeb.Blocks.Core
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         protected void btnSearch_Click( object sender, EventArgs e )
         {
-            if ( !IsSearchButtonVisible() ) return;
-
             var pageGuid = GetAttributeValue( AttributeKey.SearchResultsPage ).AsGuidOrNull();
-            var dataViewPageReference = new PageReference( Rock.SystemGuid.Page.DATA_VIEWS );
 
-            if ( !pageGuid.HasValue )
-            {
-                PageCache page = CurrentPageReference.PageId == dataViewPageReference.PageId ? PageCache.Get( Rock.SystemGuid.Page.DATAVIEW_SEARCH_RESULTS.AsGuid() ) : PageCache.Get( Rock.SystemGuid.Page.REPORT_SEARCH_RESULTS.AsGuid() );
-                pageGuid = page.Guid;
-            }
+            if ( !pageGuid.HasValue ) return;
 
             NavigateToPage( pageGuid.Value, new Dictionary<string, string>() { { "SearchType", "name" }, { "SearchTerm", tbSearch.Text.Trim() } } );
         }
@@ -584,11 +577,8 @@ namespace RockWeb.Blocks.Core
         /// </returns>
         private bool IsSearchButtonVisible()
         {
-            var dataViewPageReference = new PageReference( Rock.SystemGuid.Page.DATA_VIEWS );
-            var reportsPageReference = new PageReference( Rock.SystemGuid.Page.REPORTS_REPORTING );
             var searchResultsPage = GetAttributeValue( AttributeKey.SearchResultsPage );
-
-            return !string.IsNullOrWhiteSpace( searchResultsPage ) || CurrentPageReference.PageId == dataViewPageReference.PageId || CurrentPageReference.PageId == reportsPageReference.PageId;
+            return !string.IsNullOrWhiteSpace( searchResultsPage );
         }
     }
 }

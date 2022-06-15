@@ -84,6 +84,10 @@
     <Compile Include="Migrations\202206102113081_BinaryFileType_MaxFileSizeBytes.designer.cs">
       <DependentUpon>202206102113081_BinaryFileType_MaxFileSizeBytes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202206141552582_AddAttributeValuesToDataViewAndReportBlock.cs" />
+    <Compile Include="Migrations\202206141552582_AddAttributeValuesToDataViewAndReportBlock.designer.cs">
+      <DependentUpon>202206141552582_AddAttributeValuesToDataViewAndReportBlock.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Version 13.0\Version 1.13.3\202203101710039_AddFormBuilderBlocksAndPages.cs" />
     <Compile Include="Migrations\Version 13.0\Version 1.13.3\202203101710039_AddFormBuilderBlocksAndPages.Designer.cs">
       <DependentUpon>202203101710039_AddFormBuilderBlocksAndPages.cs</DependentUpon>
@@ -1164,6 +1168,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202206102113081_BinaryFileType_MaxFileSizeBytes.resx">
       <DependentUpon>202206102113081_BinaryFileType_MaxFileSizeBytes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206141552582_AddAttributeValuesToDataViewAndReportBlock.resx">
+      <DependentUpon>202206141552582_AddAttributeValuesToDataViewAndReportBlock.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\Version 13.0\Version 1.13.3\202203101710039_AddFormBuilderBlocksAndPages.resx">
       <DependentUpon>202203101710039_AddFormBuilderBlocksAndPages.cs</DependentUpon>
