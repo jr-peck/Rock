@@ -1,4 +1,20 @@
-﻿using Rock.Data;
+﻿// <copyright>
+// Copyright by the Spark Development Network
+//
+// Licensed under the Rock Community License (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.rockrms.com/license
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
 using Rock.Web.UI.Controls;
@@ -246,12 +262,14 @@ function() {
         private List<ListItem> GetInteractionChannelListItems( RockContext rockContext )
         {
             var websiteGuid = SystemGuid.DefinedValue.INTERACTIONCHANNELTYPE_WEBSITE.AsGuid();
+
             var channels = new InteractionChannelService( rockContext )
                 .Queryable()
                 .Where( x => x.ChannelTypeMediumValue.Guid == websiteGuid )
                 .Select( x => new ListItem() { Text = x.Name, Value = x.Id.ToString() } )
                 .ToList();
-            return channels;
+
+            return channels.OrderBy( m => m.Text ).ToList();
         }
 
         /// <summary>
@@ -391,8 +409,15 @@ function() {
             var selectionConfig = SelectionConfig.Parse( selection );
             var comparisonType = selectionConfig.ComparisonValue.ConvertToEnumOrNull<ComparisonType>();
             var rockContext = ( RockContext ) serviceInstance.Context;
+
+            var websiteInteractionChannel = DefinedValueCache.Get( SystemGuid.DefinedValue.INTERACTIONCHANNELTYPE_WEBSITE );
+            var interactionComponentIds = new InteractionComponentService( rockContext )
+                .Queryable()
+                .Where( m => m.InteractionChannel.ChannelTypeMediumValueId == websiteInteractionChannel.Id && selectionConfig.WebsiteIds.Contains( m.InteractionChannelId ) )
+                .Select( m => m.Id );
+
             var interactionQry = new InteractionSessionService( rockContext ).Queryable()
-                .Where( m => m.Interactions.Any( x => ( selectionConfig.WebsiteIds.Contains( x.InteractionComponent.InteractionChannelId ) && x.Operation == "View" ) ) );
+                .Where( m => m.Interactions.Any( x => ( interactionComponentIds.Contains( x.InteractionComponent.InteractionChannelId ) && x.Operation == "View" ) ) );
 
             if ( selectionConfig.PageIds.Count > 0 )
             {

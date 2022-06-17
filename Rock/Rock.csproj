@@ -797,7 +797,10 @@
     <Compile Include="Model\CMS\ContentLibrary\ContentLibrary.cs" />
     <Compile Include="Model\CodeGenerated\ContentLibraryService.CodeGenerated.cs" />
     <Compile Include="Model\CodeGenerated\ContentLibrarySourceService.CodeGenerated.cs" />
+    <Compile Include="Jobs\PostV14DataMigrationsUpdateCurrentSessions.cs" />
     <Compile Include="Model\Core\InteractionChannel\InteractionChannelService.cs" />
+    <Compile Include="Model\Event\RegistrationRegistrant\RegistrationRegistrant.SaveHook.cs" />
+    <Compile Include="Model\Reporting\Metric\UnitType.cs" />
     <Compile Include="Reporting\DataFilter\GroupMembers\GroupMemberGroupTypeFilter.cs" />
     <Compile Include="SystemGuid\DuplicateSystemGuidException.cs" />
     <Compile Include="SystemGuid\BlockTypeGuidAttribute.cs" />
@@ -1316,6 +1319,8 @@
     <Compile Include="Model\Workflow\Workflow\Workflow.SaveHook.cs" />
     <Compile Include="Pdf\PdfGenerator.cs" />
     <Compile Include="Pdf\PdfGeneratorException.cs" />
+    <Compile Include="Plugin\HotFixes\151_LavaDashboardWidget.cs" />
+    <Compile Include="Plugin\HotFixes\150_MigrationRollupsFor13_5_2.cs" />
     <Compile Include="Plugin\HotFixes\149_MigrationRollupsFor13_5_1.cs" />
     <Compile Include="Plugin\HotFixes\148_MigrationRollupsFor13_5_0.cs" />
     <Compile Include="Plugin\HotFixes\147_MigrationRolupsFor13_1.cs" />
@@ -1461,9 +1466,7 @@
     <Compile Include="Jobs\ContentChannelItemSelfUpdate.cs" />
     <Compile Include="Jobs\JobMigration.cs" />
     <Compile Include="Jobs\PostInstallDataMigrations.cs" />
-    <Compile Include="Jobs\PostV110DataMigrationsResponseCodeIndex.cs" />
     <Compile Include="Jobs\PostV122_UpdateInteractionIndex.cs" />
-    <Compile Include="Jobs\PostV110DataMigrationsUpdateRelatedDataViewId.cs" />
     <Compile Include="Jobs\PostV124DataMigrationsUpdateGroupSalutations.cs" />
     <Compile Include="Jobs\PostV124DataMigrationUnencryptPaymentDetailFields.cs" />
     <Compile Include="Jobs\PostV125DataMigrationsAddSystemCommunicationIndexToCommunication.cs" />
@@ -1475,8 +1478,6 @@
     <Compile Include="Jobs\CampaignManager.cs" />
     <Compile Include="Jobs\SendGroupAttendanceDigest.cs" />
     <Compile Include="Communication\SendMessageResult.cs" />
-    <Compile Include="Jobs\PostV110DataMigrationsUpdateDateKeyValues.cs" />
-    <Compile Include="Jobs\PostV103DataMigrationsSpiritualGifts.cs" />
     <Compile Include="Jobs\SyncMedia.cs" />
     <Compile Include="Lava\Blocks\CalendarEventsLavaDataSource.cs" />
     <Compile Include="Lava\Blocks\EventScheduledInstanceBlock.cs" />
@@ -1726,8 +1727,6 @@
     <Compile Include="Jobs\ConnectionRequestWorkflowTriggers.cs" />
     <Compile Include="Jobs\DataViewToWorkflow.cs" />
     <Compile Include="Jobs\SendRsvpReminders.cs" />
-    <Compile Include="Jobs\PostV100DataMigrationsSundayDate.cs" />
-    <Compile Include="Jobs\PostV100DataMigrationsValueAsNumeric.cs" />
     <Compile Include="Jobs\SendPrayerComments.cs" />
     <Compile Include="Mobile\AdditionalBlockSettings.cs" />
     <Compile Include="Jobs\UpdatePersistedDatasets.cs" />
@@ -1854,7 +1853,6 @@
     <Compile Include="Field\Types\ConditionalScaleFieldType.cs" />
     <Compile Include="Jobs\RockTriggerListener.cs" />
     <Compile Include="Jobs\GroupLeaderAbsenceNotifications.cs" />
-    <Compile Include="Jobs\PostV90DataMigrationsScheduledTransactionNotesToHistory.cs" />
     <Compile Include="Jobs\SendAssessmentReminders.cs" />
     <Compile Include="Field\Types\StreakTypeFieldType.cs" />
     <Compile Include="Jobs\SendGroupScheduleNotifications.cs" />
@@ -1869,8 +1867,6 @@
     <Compile Include="Financial\IGatewayComponent.cs" />
     <Compile Include="Financial\IHostedGatewayComponent.cs" />
     <Compile Include="Financial\IHostedGatewayPaymentControlTokenEvent.cs" />
-    <Compile Include="Jobs\PostV90DataMigrations.cs" />
-    <Compile Include="Jobs\PostV90DataMigrationsForDISC.cs" />
     <Compile Include="Financial\IWebhookGatewayComponent.cs" />
     <Compile Include="Jobs\ChargeFutureTransactions.cs" />
     <Compile Include="Lava\Shortcodes\ScheduledContentShortcode.cs" />
@@ -1938,7 +1934,6 @@
     <Compile Include="Field\Types\RegistrationTemplatesFieldType.cs" />
     <Compile Include="Jobs\NoRetryAggregateException.cs" />
     <Compile Include="Jobs\NoRetryException.cs" />
-    <Compile Include="Jobs\PostV84DataMigrations.cs" />
     <Compile Include="Lava\Shortcodes\ScripturizeShortcode.cs" />
     <Compile Include="Badge\Component\Assessment.cs" />
     <Compile Include="Model\Engagement\Step\Step.cs" />
@@ -2359,10 +2354,6 @@
     <Compile Include="Jobs\DatabaseMaintenance.cs" />
     <Compile Include="Jobs\GetNcoa.cs" />
     <Compile Include="Jobs\IndexRockSite.cs" />
-    <Compile Include="Jobs\MigrateFamilyAlternateId.cs" />
-    <Compile Include="Jobs\MigrateAttendanceOccurrenceData.cs" />
-    <Compile Include="Jobs\PostV80DataMigrations.cs" />
-    <Compile Include="Jobs\PostV74DataMigrations.cs" />
     <Compile Include="Jobs\ProcessBIAnalytics.cs" />
     <Compile Include="Jobs\PbxCdrDownload.cs" />
     <Compile Include="Jobs\DataAutomation.cs" />
@@ -3752,6 +3743,8 @@
     <Compile Include="Workflow\Action\People\PersonAddressUpdate.cs" />
     <Compile Include="Workflow\Action\People\PersonFollowAdd.cs" />
     <Compile Include="Workflow\Action\People\PersonGetCampusTeamMember.cs" />
+    <Compile Include="Workflow\Action\People\PersonGetGroupTypeAttendance.cs" />
+    <Compile Include="Workflow\Action\People\PersonGetGroupAttendance.cs" />
     <Compile Include="Workflow\Action\People\PersonGetHeadOfHousehold.cs" />
     <Compile Include="Workflow\Action\People\PersonGetSpouse.cs" />
     <Compile Include="Workflow\Action\People\PersonInDataView.cs" />
