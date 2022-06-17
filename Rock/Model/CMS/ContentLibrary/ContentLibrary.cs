@@ -69,10 +69,11 @@ namespace Rock.Model
         public string LibraryKey { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [trending enabled].
+        /// Gets or sets a value indicating whether trending is enabled for this
+        /// content library.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [trending enabled]; otherwise, <c>false</c>.
+        ///   <c>true</c> if trending is enabled; otherwise, <c>false</c>.
         /// </value>
         [DataMember]
         public bool TrendingEnabled { get; set; }
@@ -98,19 +99,32 @@ namespace Rock.Model
         public int TrendingMaxItems { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether segments should be enabled.
+        /// Gets or sets the trending gravity to apply more weight to items that
+        /// are newer.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [enable segments]; otherwise, <c>false</c>.
+        /// The trending gravity to apply more weight to items that are newer.
+        /// </value>
+        [Required]
+        [DataMember( IsRequired = true )]
+        public decimal TrendingGravity { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether personalization segments
+        /// should be enabled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if personalization segments should be enabled; otherwise, <c>false</c>.
         /// </value>
         [DataMember]
         public bool EnableSegments { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether request filters should be enabled.
+        /// Gets or sets a value indicating whether personalization request
+        /// filters should be enabled.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [enable request filters]; otherwise, <c>false</c>.
+        ///   <c>true</c> if personalization request filters should be enabled; otherwise, <c>false</c>.
         /// </value>
         [DataMember]
         public bool EnableRequestFilters { get; set; }
@@ -125,7 +139,7 @@ namespace Rock.Model
         public string FilterSettings { get; set; }
 
         /// <summary>
-        /// Gets or sets the last index date time. This property is required.
+        /// Gets or sets the last index date time.
         /// </summary>
         /// <value>
         /// The last index date time.

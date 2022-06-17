@@ -40,6 +40,7 @@ namespace Rock.Migrations
                         TrendingEnabled = c.Boolean(nullable: false),
                         TrendingWindowDay = c.Int(nullable: false),
                         TrendingMaxItems = c.Int(nullable: false),
+                        TrendingGravity = c.Decimal(nullable: false, precision: 18, scale: 2),
                         EnableSegments = c.Boolean(nullable: false),
                         EnableRequestFilters = c.Boolean(nullable: false),
                         FilterSettings = c.String(),

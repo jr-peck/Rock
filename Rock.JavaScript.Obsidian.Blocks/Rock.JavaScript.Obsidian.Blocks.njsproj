@@ -36,6 +36,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
+    <Folder Include="src\CMS\" />
+    <Folder Include="src\CMS\ContentLibraryDetail\" />
     <Folder Include="src\Core\" />
     <Folder Include="src\Core\CampusDetail\" />
     <Folder Include="src\CRM\" />
@@ -57,6 +59,10 @@
     <Folder Include="src\WorkFlow\FormBuilder\Shared\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\CMS\contentLibraryDetail.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\editPanel.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\types.d.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\viewPanel.ts" />
     <TypeScriptCompile Include="src\Core\attributes.ts" />
     <TypeScriptCompile Include="src\Core\campusDetail.ts" />
     <TypeScriptCompile Include="src\Core\CampusDetail\editPanel.ts" />
