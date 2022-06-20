@@ -91,6 +91,7 @@ import { FieldFilterSourceBag } from "@Obsidian/ViewModels/Reporting/fieldFilter
 import { PickerDisplayStyle } from "@Obsidian/Types/Controls/pickerDisplayStyle";
 import { useStore } from "@Obsidian/PageState";
 import BadgeComponentPicker from "@Obsidian/Controls/badgeComponentPicker";
+import DataViewsPicker from "@Obsidian/Controls/dataViewsPicker";
 
 // #region Gallery Support
 
@@ -3139,6 +3140,75 @@ const binaryFilePickerGallery = defineComponent({
 </GalleryAndResult>`
 });
 
+
+/** Demonstrates data views picker */
+const dataViewsPickerGallery = defineComponent({
+    name: "DataViewsPickerGallery",
+    components: {
+        GalleryAndResult,
+        CheckBox,
+        DropDownList,
+        DataViewsPicker,
+        NumberUpDown,
+        EntityTypePicker
+    },
+    setup() {
+        return {
+            columnCount: ref(0),
+            displayStyle: ref(PickerDisplayStyle.Auto),
+            displayStyleItems,
+            entityTypeGuid: ref(null),
+            enhanceForLongLists: ref(false),
+            multiple: ref(false),
+            showBlankItem: ref(false),
+            value: ref({}),
+            importCode: getControlImportPath("dataViewsPicker"),
+            exampleCode: `<DataViewsPicker label="Data Views" v-model="value" />`
+        };
+    },
+    template: `
+<GalleryAndResult
+    :value="value"
+    :importCode="importCode"
+    :exampleCode="exampleCode"
+    enableReflection
+>
+    <DataViewsPicker label="Data Views"
+        v-model="value"
+        :multiple="multiple"
+        :columnCount="columnCount"
+        :enhanceForLongLists="enhanceForLongLists"
+        :displayStyle="displayStyle"
+        :showBlankItem="showBlankItem"
+        :entityTypeGuid="entityTypeGuid?.value" />
+    <template #settings>
+        <div class="row">
+            <div class="col-md-4">
+                <CheckBox label="Multiple" v-model="multiple" />
+            </div>
+            <div class="col-md-4">
+                <CheckBox label="Enhance For Long Lists" v-model="enhanceForLongLists" />
+            </div>
+            <div class="col-md-4">
+                <CheckBox label="Show Blank Item" v-model="showBlankItem" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <DropDownList label="Display Style" v-model="displayStyle" :items="displayStyleItems" />
+            </div>
+            <div class="col-md-4">
+                <NumberUpDown label="Column Count" v-model="columnCount" :min="0" />
+            </div>
+            <div class="col-md-4">
+                <EntityTypePicker label="For Entity Type" v-model="entityTypeGuid" enhanceForLongLists showBlankItem />
+            </div>
+        </div>
+    </template>
+</GalleryAndResult>`
+});
+
+
 /** Demonstrates audit detail. */
 const auditDetailGallery = defineComponent({
     name: "AuditDetailGallery",
@@ -3235,7 +3305,8 @@ const controlGalleryComponents: Record<string, Component> = [
     assetStorageProviderPickerGallery,
     auditDetailGallery,
     binaryFileTypePickerGallery,
-    binaryFilePickerGallery
+    binaryFilePickerGallery,
+    dataViewsPickerGallery
 ]
     // Sort list by component name
     .sort((a, b) => a.name.localeCompare(b.name))

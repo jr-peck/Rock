@@ -298,7 +298,7 @@ namespace Rock.Rest.v2
         #region Binary File Picker
 
         /// <summary>
-        /// Gets the asset storage providers that can be displayed in the asset storage provider picker.
+        /// Gets the binary files that can be displayed in the binary file picker.
         /// </summary>
         /// <param name="options">The options that describe which items to load.</param>
         /// <returns>A collection of view models that represent the tree items.</returns>
@@ -433,6 +433,61 @@ namespace Rock.Rest.v2
             else
             {
                 return value;
+            }
+        }
+
+        #endregion
+
+        #region Data Views Picker
+
+        /// <summary>
+        /// Gets the child items that match the options sent in the request body.
+        /// This endpoint returns items formatted for use in a tree view control.
+        /// </summary>
+        /// <param name="options">The options that describe which data views to load.</param>
+        /// <returns>A collection of view models that represent the defined values.</returns>
+        [HttpPost]
+        [System.Web.Http.Route( "DataViewsPickerGetDataViews" )]
+        [Authenticate]
+        [Rock.SystemGuid.RestActionGuid( "1E079A57-9B44-4365-9C9C-2383A9A3F45B" )]
+        public IHttpActionResult DataViewsPickerGetDataViews( DataViewsPickerGetDataViewsOptionsBag options )
+        {
+            if (options.EntityTypeGuid == null)
+            {
+                return NotFound();
+            }
+
+            using ( var rockContext = new RockContext() )
+            {
+                var entityTypeId = EntityTypeCache.GetId( options.EntityTypeGuid );
+                var grant = SecurityGrant.FromToken( options.SecurityGrantToken );
+
+                var allEntityFilters = new DataViewFilterService( rockContext )
+                   .Queryable().AsNoTracking()
+                   .Where( f => f.EntityTypeId == entityTypeId )
+                   .ToList();
+
+                var list = new DataViewService( rockContext )
+                    .GetByEntityTypeId( entityTypeId.Value )
+                    .Include( "EntityType" )
+                    .Include( "Category" )
+                    .Include( "DataViewFilter" )
+                    .AsNoTracking()
+                    .Where( v => v.DataViewFilter != null )
+                    .ToList()
+                    .Where( v => 
+                        ( v.IsAuthorized( Authorization.VIEW, RockRequestContext.CurrentPerson ) || grant?.IsAccessGranted( v, Authorization.VIEW ) == true )
+                        && v.DataViewFilter.IsAuthorized( Authorization.VIEW, RockRequestContext.CurrentPerson, allEntityFilters )
+                    )
+                    .Select( v => new ListItemBag
+                    {
+                        Value = v.Guid.ToString(),
+                        Text = v.Name,
+                        Category = v.Category.ToString()
+                    } )
+                    .ToList();
+
+                return Ok( list );
             }
         }
 
