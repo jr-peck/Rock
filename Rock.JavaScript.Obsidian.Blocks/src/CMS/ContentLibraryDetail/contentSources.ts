@@ -114,7 +114,13 @@ export default defineComponent({
         });
 
         const sourceEntityAttributeItems = computed((): ListItemBag[] => {
-            return sourceEntityAttributeTable.value[sourceSelectedEntity.value] ?? [];
+            return (sourceEntityAttributeTable.value[sourceSelectedEntity.value] ?? [])
+                .map(li => {
+                    return {
+                        value: li.value,
+                        text: li.category ? `${li.text} (${li.category})` : li.text
+                    };
+                });
         });
 
         // #endregion
