@@ -59,6 +59,8 @@ export default defineComponent({
 
         const panelMode = ref(DetailPanelMode.View);
 
+        const isContentSourcesActive = ref(true);
+
         // The properties that are being edited in the UI. This is used to
         // inform the server which incoming values have valid data in them.
         const validProperties = [
@@ -78,8 +80,6 @@ export default defineComponent({
         ];
 
         const refreshAttributesDebounce = debounce(() => refreshDetailAttributes(contentLibraryEditBag, validProperties, invokeBlockAction), undefined, true);
-
-        const isContentSourcesActive = ref(true);
 
         // #endregion
 

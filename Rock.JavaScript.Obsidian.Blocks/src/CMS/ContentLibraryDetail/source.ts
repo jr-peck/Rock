@@ -158,6 +158,7 @@ export default defineComponent({
     </div>
     <div class="actions">
         <span class="item-count badge badge-default">{{ itemCount }}</span>
+        <span class="reorder-handle btn btn-default btn-sm"><i class="fa fa-bars"></i></span>
         <RockButton btnSize="sm" @click="onEditClick"><i class="fa fa-pencil"></i></RockButton>
         <RockButton btnSize="sm" @click="onDeleteClick"><i class="fa fa-times"></i></RockButton>
     </div>

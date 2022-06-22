@@ -222,6 +222,8 @@ namespace Rock.Blocks.CMS
             }
 
             bag.Sources = entity.ContentLibrarySources
+                .OrderBy( s => s.Order )
+                .ThenBy( s => s.Id )
                 .Select( s => GetContentSourceBag( s, rockContext ) )
                 .Where( s => s != null )
                 .ToList();
@@ -835,6 +837,10 @@ namespace Rock.Blocks.CMS
                         EntityId = entityId
                     };
                     library.ContentLibrarySources.Add( source );
+
+                    source.Order = library.ContentLibrarySources
+                        .Select( cls => cls.Order + 1 )
+                        .Max();
                 }
 
                 // Update the source with the new settings.
@@ -902,6 +908,42 @@ namespace Rock.Blocks.CMS
                 };
 
                 return ActionOk( box );
+            }
+        }
+
+        /// <summary>
+        /// Changes the ordered position of a single source in the content library.
+        /// </summary>
+        /// <param name="key">The identifier of the content library whose sources will be reordered.</param>
+        /// <param name="guid">The unique identifier of the source that will be moved.</param>
+        /// <param name="beforeGuid">The unique identifier of the source it will be placed before.</param>
+        /// <returns>An empty result that indicates if the operation succeeded.</returns>
+        [BlockAction]
+        public BlockActionResult ReorderSource( string key, Guid guid, Guid? beforeGuid )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var contentLibraryService = new ContentLibraryService( rockContext );
+
+                if ( !TryGetEntityForEditAction( key, rockContext, out var library, out var actionError, qry => qry.Include( l => l.ContentLibrarySources ) ) )
+                {
+                    return actionError;
+                }
+
+                // Put them in a properly ordered list.
+                var sources = library.ContentLibrarySources
+                    .OrderBy( s => s.Order )
+                    .ThenBy( s => s.Id )
+                    .ToList();
+
+                if ( !sources.ReorderEntity( guid.ToString(), beforeGuid?.ToString() ) )
+                {
+                    return ActionBadRequest( "Invalid reorder attempt." );
+                }
+
+                rockContext.SaveChanges();
+
+                return ActionOk();
             }
         }
 

@@ -23,6 +23,7 @@ import NumberBox from "@Obsidian/Controls/numberBox";
 import Panel from "@Obsidian/Controls/panel";
 import RockButton from "@Obsidian/Controls/rockButton";
 import SectionHeader from "@Obsidian/Controls/sectionHeader";
+import { DragReorder, useDragReorder } from "@Obsidian/Directives/dragDrop";
 import { AvailableContentSourceBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/availableContentSourceBag";
 import { ContentLibraryBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/contentLibraryBag";
 import { ContentLibraryDetailOptionsBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/contentLibraryDetailOptionsBag";
@@ -56,6 +57,10 @@ export default defineComponent({
             type: Object as PropType<ContentLibraryBag>,
             required: true
         }
+    },
+
+    directives: {
+        DragReorder
     },
 
     emits: {
@@ -229,6 +234,11 @@ export default defineComponent({
                     text: e.name
                 }));
 
+            sourceEntityAttributeTable.value = result.data.reduce((table, c) => {
+                table[c.guid ?? ""] = c.attributes ?? [];
+                return table;
+            }, {} as Record<string, ListItemBag[]>);
+
             sourceEditBag.value = {
                 entityTypeGuid: EntityType.ContentChannel,
                 occurrencesToShow: 0,
@@ -345,7 +355,31 @@ export default defineComponent({
             isSourceModalOpen.value = true;
         };
 
+        /**
+         * Event Handler for when the sources have been re-ordered by the person
+         * via a drag and drop action.
+         * 
+         * @param value The value that was moved in the list.
+         * @param beforeValue The value it was placed before or null if end of list.
+         */
+        const onSourceReorder = async (value: ContentSourceBag, beforeValue: ContentSourceBag | null): Promise<void> => {
+            const data = {
+                key: props.modelValue.idKey,
+                guid: value.guid,
+                beforeGuid: beforeValue?.guid ?? null
+            };
+
+            const result = await invokeBlockAction("ReorderSource", data);
+
+            if (!result.isSuccess) {
+                alert(result.errorMessage || "Unable to re-order sources, you might need to reload the page.");
+                return;
+            }
+        };
+
         // #endregion
+
+        const reorderDragOptions = useDragReorder(librarySources, onSourceReorder);
 
         watch(() => props.modelValue, () => {
             updateRefValue(librarySources, props.modelValue?.sources ?? []);
@@ -380,6 +414,7 @@ export default defineComponent({
             onSourceSave,
             onDeleteSource,
             onEditSource,
+            reorderDragOptions,
             sourceEntityAttributeItems,
             sourceEntityItems,
             sourceModalEntityName,
@@ -408,7 +443,9 @@ export default defineComponent({
         </template>
     </SectionHeader>
 
-    <Source v-for="source in librarySources" :key="source.guid" v-model="source" @delete="onDeleteSource" @edit="onEditSource" />
+    <div class="library-content-sources" v-drag-reorder="reorderDragOptions">
+        <Source v-for="source in librarySources" :key="source.guid" v-model="source" @delete="onDeleteSource" @edit="onEditSource" />
+    </div>
 </Panel>
 
 <Modal v-model="isSourceModalOpen"
