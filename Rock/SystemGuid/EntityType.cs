@@ -204,6 +204,11 @@ namespace Rock.SystemGuid
         public const string ENTITY_TYPE = "A2277FBA-D09F-4D07-B0AB-1C650C25A7A7";
 
         /// <summary>
+        /// The guid for Rock.Model.EventCalendar entity.
+        /// </summary>
+        public const string EVENT_CALENDAR = "E67D8D6D-4FE6-48D5-A940-A39213047314";
+
+        /// <summary>
         /// The guid for the Rock.Model.FinancialAccount entity.
         /// </summary>
         public const string FINANCIAL_ACCOUNT = "798BCE48-6AA7-4983-9214-F9BCEFB4521D";
