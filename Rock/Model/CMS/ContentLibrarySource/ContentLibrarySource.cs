@@ -30,7 +30,7 @@ namespace Rock.Model
     [Table( "ContentLibrarySource" )]
     [DataContract]
     [Rock.SystemGuid.EntityTypeGuid( Rock.SystemGuid.EntityType.CONTENT_LIBRARY_SOURCE )]
-    public partial class ContentLibrarySource : Model<ContentLibrarySource>
+    public partial class ContentLibrarySource : Model<ContentLibrarySource>, IOrdered
     {
         #region Entity Properties
 
@@ -81,6 +81,10 @@ namespace Rock.Model
         [Required]
         [DataMember( IsRequired = true )]
         public int ContentLibraryId { get; set; }
+
+        /// <inheritdoc/>
+        [DataMember]
+        public int Order { get; set; }
 
         #endregion Entity Properties
 

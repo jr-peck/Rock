@@ -72,6 +72,7 @@ namespace Rock.Migrations
                         OccurrencesToShow = c.Int(nullable: false),
                         AdditionalSettings = c.String(),
                         ContentLibraryId = c.Int(nullable: false),
+                        Order = c.Int(nullable: false),
                         CreatedDateTime = c.DateTime(),
                         ModifiedDateTime = c.DateTime(),
                         CreatedByPersonAliasId = c.Int(),
