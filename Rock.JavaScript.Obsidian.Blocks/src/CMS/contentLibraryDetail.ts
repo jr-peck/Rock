@@ -347,11 +347,11 @@ export default defineComponent({
         flex: 1 0 0;
     }
 
-    .library-source > .title > .text {
+    .content-library-detail .library-source > .title > .text {
         font-weight: bold;
     }
 
-    .library-source > .title > .secondary-text {
+    .content-library-detail .library-source > .title > .secondary-text {
         color: #737475;
         font-size: 0.8em;
     }
@@ -364,6 +364,42 @@ export default defineComponent({
 
     .content-library-detail .library-source > .actions > .item-count {
         margin-right: 12px;
+    }
+
+    .content-library-detail .search-filter-row {
+        display: flex;
+    }
+
+    .content-library-detail .search-filter-row + .search-filter-row {
+        border-top: 1px solid #dfe0e1;
+        padding-top: 24px;
+    }
+
+    .content-library-detail .search-filter-icon {
+        width: 48px;
+        text-align: center;
+        font-size: 20px;
+    }
+
+    .content-library-detail .search-filter-content {
+        flex: 1 0 0;
+    }
+
+    .content-library-detail .search-filter-title {
+        font-weight: bold;
+    }
+
+    .content-library-detail .search-filter-description {
+    }
+
+    .content-library-detail .search-filter-content > fieldset {
+        margin-top: 24px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .content-library-detail .search-filter-content > fieldset > dl {
+        flex: 1 0 33.33%;
     }
 </v-style>
 
