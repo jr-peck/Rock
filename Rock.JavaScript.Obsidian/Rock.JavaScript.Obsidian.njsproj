@@ -86,6 +86,7 @@
     <Folder Include="Framework\ViewModels\" />
     <Folder Include="Framework\ViewModels\Blocks\" />
     <Folder Include="Framework\ViewModels\Blocks\CMS\" />
+    <Folder Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\" />
     <Folder Include="Framework\ViewModels\Blocks\Core\" />
     <Folder Include="Framework\ViewModels\Blocks\Core\CampusDetail\" />
     <Folder Include="Framework\ViewModels\Blocks\CRM\" />
@@ -369,8 +370,11 @@
     <TypeScriptCompile Include="Framework\Utility\util.ts" />
     <TypeScriptCompile Include="Framework\Core\Reporting\comparisonType.ts" />
     <TypeScriptCompile Include="Framework\Core\Reporting\filterExpressionType.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\availableContentSourceBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\contentChannelSourceBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\contentLibraryBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\contentLibraryDetailOptionsBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\contentSourceBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Core\CampusDetail\campusBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Core\CampusDetail\campusDetailOptionsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Core\CampusDetail\campusScheduleBag.d.ts" />

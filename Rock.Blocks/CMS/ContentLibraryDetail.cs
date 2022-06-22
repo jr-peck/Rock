@@ -18,14 +18,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Entity;
 using System.Linq;
 
 using Rock.Attribute;
 using Rock.Constants;
 using Rock.Data;
 using Rock.Model;
+using Rock.Security;
 using Rock.ViewModels.Blocks;
 using Rock.ViewModels.Blocks.CMS.ContentLibraryDetail;
+using Rock.ViewModels.Utility;
+using Rock.Web.Cache;
 
 namespace Rock.Blocks.CMS
 {
@@ -132,7 +136,7 @@ namespace Rock.Blocks.CMS
                     // Existing entity was found, prepare for view mode by default.
                     if ( isViewable )
                     {
-                        box.Entity = GetEntityBagForView( entity, loadAttributes );
+                        box.Entity = GetEntityBagForView( entity, loadAttributes, rockContext );
                         box.SecurityGrantToken = GetSecurityGrantToken( entity );
                     }
                     else
@@ -184,6 +188,7 @@ namespace Rock.Blocks.CMS
                 LibraryKey = entity.LibraryKey,
                 Name = entity.Name,
                 TrendingEnabled = entity.TrendingEnabled,
+                TrendingGravity = entity.TrendingGravity,
                 TrendingMaxItems = entity.TrendingMaxItems,
                 TrendingWindowDay = entity.TrendingWindowDay
             };
@@ -194,8 +199,9 @@ namespace Rock.Blocks.CMS
         /// </summary>
         /// <param name="entity">The entity to be represented for view purposes.</param>
         /// <param name="loadAttributes"><c>true</c> if attributes and values should be loaded; otherwise <c>false</c>.</param>
+        /// <param name="rockContext">The context to use when accessing the database.</param>
         /// <returns>A <see cref="ContentLibraryBag"/> that represents the entity.</returns>
-        private ContentLibraryBag GetEntityBagForView( ContentLibrary entity, bool loadAttributes )
+        private ContentLibraryBag GetEntityBagForView( ContentLibrary entity, bool loadAttributes, RockContext rockContext )
         {
             if ( entity == null )
             {
@@ -208,6 +214,11 @@ namespace Rock.Blocks.CMS
             {
                 bag.LoadAttributesAndValuesForPublicView( entity, RequestContext.CurrentPerson );
             }
+
+            bag.Sources = entity.ContentLibrarySources
+                .Select( s => GetContentSourceBag( s, rockContext ) )
+                .Where( s => s != null )
+                .ToList();
 
             return bag;
         }
@@ -261,12 +272,6 @@ namespace Rock.Blocks.CMS
             box.IfValidProperty( nameof( box.Entity.FilterSettings ),
                 () => entity.FilterSettings = box.Entity.FilterSettings );
 
-            box.IfValidProperty( nameof( box.Entity.LastIndexDateTime ),
-                () => entity.LastIndexDateTime = box.Entity.LastIndexDateTime );
-
-            box.IfValidProperty( nameof( box.Entity.LastIndexItemCount ),
-                () => entity.LastIndexItemCount = box.Entity.LastIndexItemCount );
-
             box.IfValidProperty( nameof( box.Entity.LibraryKey ),
                 () => entity.LibraryKey = box.Entity.LibraryKey );
 
@@ -281,6 +286,9 @@ namespace Rock.Blocks.CMS
 
             box.IfValidProperty( nameof( box.Entity.TrendingWindowDay ),
                 () => entity.TrendingWindowDay = box.Entity.TrendingWindowDay );
+
+            box.IfValidProperty( nameof( box.Entity.TrendingGravity ),
+                () => entity.TrendingGravity = box.Entity.TrendingGravity );
 
             box.IfValidProperty( nameof( box.Entity.AttributeValues ),
                 () =>
@@ -353,9 +361,10 @@ namespace Rock.Blocks.CMS
         /// <param name="entity">Contains the entity that was loaded when <c>true</c> is returned.</param>
         /// <param name="error">Contains the action error result when <c>false</c> is returned.</param>
         /// <returns><c>true</c> if the entity was loaded and passed security checks.</returns>
-        private bool TryGetEntityForEditAction( string idKey, RockContext rockContext, out ContentLibrary entity, out BlockActionResult error )
+        private bool TryGetEntityForEditAction( string idKey, RockContext rockContext, out ContentLibrary entity, out BlockActionResult error, Func<IQueryable<ContentLibrary>, IQueryable<ContentLibrary>> qryAdditions = null )
         {
             var entityService = new ContentLibraryService( rockContext );
+            IQueryable<ContentLibrary> qry;
             error = null;
 
             // Determine if we are editing an existing entity or creating a new one.
@@ -363,7 +372,14 @@ namespace Rock.Blocks.CMS
             {
                 // If editing an existing entity then load it and make sure it
                 // was found and can still be edited.
-                entity = entityService.Get( idKey, !PageCache.Layout.Site.DisablePredictableIds );
+                qry = entityService.GetQueryableByKey( idKey, !PageCache.Layout.Site.DisablePredictableIds );
+
+                if ( qryAdditions != null )
+                {
+                    qry = qryAdditions( qry );
+                }
+
+                entity = qry.SingleOrDefault();
             }
             else
             {
@@ -385,6 +401,92 @@ namespace Rock.Blocks.CMS
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Translates the <paramref name="source"/> into a bag that can be
+        /// sent to the client to display and edit the source.
+        /// </summary>
+        /// <param name="source">The library source that will be sent to the client.</param>
+        /// <param name="rockContext">The context to use when accessing the database.</param>
+        /// <returns>A new <see cref="ContentSourceBag"/> instance that represents <paramref name="source"/>.</returns>
+        private static ContentSourceBag GetContentSourceBag( ContentLibrarySource source, RockContext rockContext )
+        {
+            var contentChannelEntityTypeId = EntityTypeCache.GetId<ContentChannel>() ?? 0;
+            var eventCalendarEntityTypeId = EntityTypeCache.GetId<EventCalendar>() ?? 0;
+            string name;
+            Guid entityGuid;
+            string color;
+            string iconCssClass;
+            int itemCount;
+
+            // Process the entity as a content channel source.
+            if ( source.EntityTypeId == contentChannelEntityTypeId )
+            {
+                var contentChannel = new ContentChannelService( rockContext ).Get( source.EntityId );
+
+                if ( contentChannel == null )
+                {
+                    return null;
+                }
+
+                name = contentChannel.Name;
+                entityGuid = contentChannel.Guid;
+                itemCount = new ContentChannelItemService( rockContext ).Queryable()
+                    .Where( cci => cci.ContentChannelId == contentChannel.Id )
+                    .Count();
+                color = "#009ce3";
+                iconCssClass = contentChannel.IconCssClass.ToStringOrDefault( "fa fa-bullhorn" );
+            }
+
+            // Process the entity as an event calendar source.
+            else if ( source.EntityTypeId == eventCalendarEntityTypeId )
+            {
+                var eventCalendar = new EventCalendarService( rockContext ).Get( source.EntityId );
+
+                if ( eventCalendar == null )
+                {
+                    return null;
+                }
+
+                name = eventCalendar.Name;
+                entityGuid = eventCalendar.Guid;
+                itemCount = new EventCalendarItemService( rockContext ).Queryable()
+                    .Where( cci => cci.EventCalendarId == eventCalendar.Id )
+                    .Count();
+                color = "#09ae77";
+                iconCssClass = eventCalendar.IconCssClass.ToStringOrDefault( "fa fa-calendar-alt" );
+            }
+            else
+            {
+                return null;
+            }
+
+            // Get the additional settings or a default object.
+            var additionalSettings = source.AdditionalSettings
+                    .FromJsonOrNull<AdditionalSourceSettings>() ?? new AdditionalSourceSettings();
+
+            // Create the bag that represents the source.
+            return new ContentSourceBag
+            {
+                Guid = source.Guid,
+                Name = name,
+                EntityTypeGuid = EntityTypeCache.Get( source.EntityTypeId ).Guid,
+                EntityGuid = entityGuid,
+                Color = color,
+                IconCssClass = iconCssClass,
+                OccurrencesToShow = source.OccurrencesToShow,
+                ItemCount = itemCount,
+                Attributes = additionalSettings.AttributeGuids
+                    .Select( g => AttributeCache.Get( g ) )
+                    .Where( g => g != null )
+                    .Select( g => new ListItemBag
+                    {
+                        Value = g.Guid.ToString(),
+                        Text = g.Name
+                    } )
+                    .ToList()
+            };
         }
 
         #endregion
@@ -467,7 +569,7 @@ namespace Rock.Blocks.CMS
                 entity = entityService.Get( entity.Id );
                 entity.LoadAttributes( rockContext );
 
-                return ActionOk( GetEntityBagForView( entity, true ) );
+                return ActionOk( GetEntityBagForView( entity, true, rockContext ) );
             }
         }
 
@@ -554,6 +656,260 @@ namespace Rock.Blocks.CMS
             }
         }
 
+        /// <summary>
+        /// Gets a list of all the content channels that are available for the
+        /// individual to use when adding or editing a content channel source.
+        /// </summary>
+        /// <returns>A collection of <see cref="AvailableContentSourceBag"/> objects.</returns>
+        [BlockAction]
+        public BlockActionResult GetAvailableContentChannels()
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var contentChannels = new ContentChannelService( rockContext )
+                    .Queryable()
+                    .OrderBy( c => c.Name )
+                    .ToList()
+                    .Where( c => c.IsAuthorized( Authorization.VIEW, RequestContext.CurrentPerson ) )
+                    .ToList();
+
+                var availableSources = contentChannels
+                    .Select( c =>
+                    {
+                        var item = new ContentChannelItem
+                        {
+                            ContentChannelId = c.Id
+                        };
+
+                        item.LoadAttributes( rockContext );
+
+                        return new AvailableContentSourceBag
+                        {
+                            Guid = c.Guid,
+                            Name = c.Name,
+                            Attributes = item.Attributes.Select( a => new ListItemBag
+                            {
+                                Value = a.Value.Guid.ToString(),
+                                Text = a.Value.Name,
+                                Category = a.Value.FieldType.Name
+                            } ).ToList()
+                        };
+                    } );
+
+                return ActionOk( availableSources );
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all the event calendars that are available for the
+        /// individual to use when adding or editing a event calendar source.
+        /// </summary>
+        /// <returns>A collection of <see cref="AvailableContentSourceBag"/> objects.</returns>
+        [BlockAction]
+        public BlockActionResult GetAvailableEventCalendars()
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var eventCalendars = new EventCalendarService( rockContext )
+                    .Queryable()
+                    .OrderBy( ec => ec.Name )
+                    .ToList()
+                    .Where( ec => ec.IsAuthorized( Authorization.VIEW, RequestContext.CurrentPerson ) )
+                    .ToList();
+
+                var availableSources = eventCalendars
+                    .Select( ec =>
+                    {
+                        var item = new EventCalendarItem
+                        {
+                            EventCalendarId = ec.Id
+                        };
+
+                        item.LoadAttributes( rockContext );
+
+                        return new AvailableContentSourceBag
+                        {
+                            Guid = ec.Guid,
+                            Name = ec.Name,
+                            Attributes = item.Attributes.Select( a => new ListItemBag
+                            {
+                                Value = a.Value.Guid.ToString(),
+                                Text = a.Value.Name,
+                                Category = a.Value.FieldType.Name
+                            } ).ToList()
+                        };
+                    } );
+
+                return ActionOk( availableSources );
+            }
+        }
+
+        /// <summary>
+        /// Saves the edits to a library source. This will either update an
+        /// existing library source or create a new one.
+        /// </summary>
+        /// <param name="key">The identifier of the content library to be modified.</param>
+        /// <param name="bag">The source to be added or updated.</param>
+        /// <returns>The detail box that contains the new entity information to be displayed.</returns>
+        [BlockAction]
+        public BlockActionResult SaveLibrarySource( string key, ContentSourceBag bag )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var contentLibraryService = new ContentLibraryService( rockContext );
+
+                if ( !TryGetEntityForEditAction( key, rockContext, out var library, out var actionError, qry => qry.Include( l => l.ContentLibrarySources ) ) )
+                {
+                    return actionError;
+                }
+
+                int entityTypeId = 0;
+                int entityId = 0;
+
+                // Find the source entity to be added. Either a content channel
+                // or an event calendar.
+                if ( bag.EntityTypeGuid == SystemGuid.EntityType.CONTENT_CHANNEL.AsGuid() )
+                {
+                    // Verify the content channel specified exists and that the
+                    // person has access to it.
+                    var contentChannel = new ContentChannelService( rockContext ).Get( bag.EntityGuid );
+
+                    if ( contentChannel == null )
+                    {
+                        return ActionNotFound( "Content channel was not found." );
+                    }
+
+                    if ( !contentChannel.IsAuthorized( Authorization.VIEW, RequestContext.CurrentPerson ) )
+                    {
+                        return ActionForbidden( "Not authorized to view this content channel." );
+                    }
+
+                    entityTypeId = EntityTypeCache.GetId<ContentChannel>().Value;
+                    entityId = contentChannel.Id;
+                }
+                else if ( bag.EntityTypeGuid == SystemGuid.EntityType.EVENT_CALENDAR.AsGuid() )
+                {
+                    // Verify the event calendar specified exists and that the
+                    // person has access to it.
+                    var eventCalendar = new EventCalendarService( rockContext ).Get( bag.EntityGuid );
+
+                    if ( eventCalendar == null )
+                    {
+                        return ActionNotFound( "Event calendar was not found." );
+                    }
+
+                    if ( !eventCalendar.IsAuthorized( Authorization.VIEW, RequestContext.CurrentPerson ) )
+                    {
+                        return ActionForbidden( "Not authorized to view this event calendar." );
+                    }
+
+                    entityTypeId = EntityTypeCache.GetId<EventCalendar>().Value;
+                    entityId = eventCalendar.Id;
+                }
+                else
+                {
+                    return ActionBadRequest( "Invalid source type." );
+                }
+
+                // Find the existing matching source or create a new one.
+                var source = library.ContentLibrarySources
+                    .Where( s => s.EntityTypeId == entityTypeId && s.EntityId == entityId )
+                    .FirstOrDefault();
+
+                if ( source == null )
+                {
+                    source = new ContentLibrarySource
+                    {
+                        EntityTypeId = entityTypeId,
+                        EntityId = entityId
+                    };
+                    library.ContentLibrarySources.Add( source );
+                }
+
+                // Update the source with the new settings.
+                var additionalSettings = new AdditionalSourceSettings
+                {
+                    AttributeGuids = bag.Attributes?.Select( a => a.Value.AsGuid() ).ToList() ?? new List<Guid>()
+                };
+
+                source.OccurrencesToShow = bag.OccurrencesToShow;
+                source.AdditionalSettings = additionalSettings.ToJson();
+
+                rockContext.SaveChanges();
+
+                // Load the attributes on the library and return the new entity bag.
+                library.LoadAttributes( rockContext );
+
+                var box = new DetailBlockBox<ContentLibraryBag, ContentLibraryDetailOptionsBag>
+                {
+                    Entity = GetEntityBagForView( library, true, rockContext )
+                };
+
+                return ActionOk( box );
+            }
+        }
+
+        /// <summary>
+        /// Deletes an existing library source from the content library.
+        /// </summary>
+        /// <param name="key">The identifier of the content library to be modified.</param>
+        /// <param name="sourceGuid">The unique identifier of the source to be deleted.</param>
+        /// <returns>The detail box that contains the new entity information to be displayed.</returns>
+        [BlockAction]
+        public BlockActionResult DeleteLibrarySource( string key, Guid sourceGuid )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var contentLibraryService = new ContentLibraryService( rockContext );
+                var contentLibrarySourceService = new ContentLibrarySourceService( rockContext );
+
+                if ( !TryGetEntityForEditAction( key, rockContext, out var library, out var actionError, qry => qry.Include( l => l.ContentLibrarySources ) ) )
+                {
+                    return actionError;
+                }
+
+                // Find the existing matching source or create a new one.
+                var source = library.ContentLibrarySources
+                    .Where( s => s.Guid == sourceGuid )
+                    .SingleOrDefault();
+
+                if ( source == null )
+                {
+                    return ActionNotFound( "Source was not found." );
+                }
+
+                // Delete the source.
+                contentLibrarySourceService.Delete( source );
+                rockContext.SaveChanges();
+
+                // Send back a new box with the entity to display.
+                library.LoadAttributes( rockContext );
+
+                var box = new DetailBlockBox<ContentLibraryBag, ContentLibraryDetailOptionsBag>
+                {
+                    Entity = GetEntityBagForView( library, true, rockContext )
+                };
+
+                return ActionOk( box );
+            }
+        }
+
         #endregion
+
+        /// <summary>
+        /// The structured object for the additional settings of a content
+        /// library source.
+        /// </summary>
+        private class AdditionalSourceSettings
+        {
+            /// <summary>
+            /// Gets or sets the attribute unique identifiers that are enabled
+            /// for the content source.
+            /// </summary>
+            /// <value>
+            /// The attribute unique identifiers that are enabled.
+            /// </value>
+            public List<Guid> AttributeGuids { get; set; }
+        }
     }
 }

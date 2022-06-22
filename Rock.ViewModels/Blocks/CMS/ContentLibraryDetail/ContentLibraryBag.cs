@@ -16,6 +16,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 
 using Rock.ViewModels.Utility;
 
@@ -82,5 +83,11 @@ namespace Rock.ViewModels.Blocks.CMS.ContentLibraryDetail
         /// Gets or sets the trending gravity to apply more weight to items that are newer.
         /// </summary>
         public decimal TrendingGravity { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sources that are currently configured for this
+        /// library. This value is not used during save operations.
+        /// </summary>
+        public List<ContentSourceBag> Sources { get; set; }
     }
 }

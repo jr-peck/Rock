@@ -21,7 +21,9 @@ import { EntityType } from "@Obsidian/SystemGuids";
 import DetailBlock from "@Obsidian/Templates/detailBlock";
 import { DetailPanelMode } from "@Obsidian/Types/Controls/detailPanelMode";
 import { PanelAction } from "@Obsidian/Types/Controls/panelAction";
+import ContentSources from "./ContentLibraryDetail/contentSources";
 import EditPanel from "./ContentLibraryDetail/editPanel";
+import SearchFilters from "./ContentLibraryDetail/searchFilters";
 import ViewPanel from "./ContentLibraryDetail/viewPanel";
 import { getSecurityGrant, provideSecurityGrant, refreshDetailAttributes, useConfigurationValues, useInvokeBlockAction } from "@Obsidian/Utility/block";
 import { debounce } from "@Obsidian/Utility/util";
@@ -35,6 +37,8 @@ export default defineComponent({
 
     components: {
         Alert,
+        ContentSources,
+        SearchFilters,
         EditPanel,
         DetailBlock,
         ViewPanel
@@ -68,11 +72,14 @@ export default defineComponent({
             "libraryKey",
             "name",
             "trendingEnabled",
+            "trendingGravity",
             "trendingMaxItems",
-            "trendingWindowDay"
+            "trendingWindowDay",
         ];
 
         const refreshAttributesDebounce = debounce(() => refreshDetailAttributes(contentLibraryEditBag, validProperties, invokeBlockAction), undefined, true);
+
+        const isContentSourcesActive = ref(true);
 
         // #endregion
 
@@ -111,6 +118,18 @@ export default defineComponent({
 
         const options = computed((): ContentLibraryDetailOptionsBag => {
             return config.options ?? {};
+        });
+
+        const isViewing = computed((): boolean => {
+            return panelMode.value === DetailPanelMode.View;
+        });
+
+        const contentSourcesNavClass = computed((): string => {
+            return isContentSourcesActive.value ? "active" : "";
+        });
+
+        const searchFiltersNavClass = computed((): string => {
+            return isContentSourcesActive.value ? "" : "active";
         });
 
         // #endregion
@@ -233,6 +252,14 @@ export default defineComponent({
             return false;
         };
 
+        const onContentSourcesNav = (): void => {
+            isContentSourcesActive.value = true;
+        };
+
+        const onSearchFiltersNav = (): void => {
+            isContentSourcesActive.value = false;
+        };
+
         // #endregion
 
         provideSecurityGrant(securityGrant);
@@ -252,20 +279,26 @@ export default defineComponent({
         return {
             contentLibraryViewBag,
             contentLibraryEditBag,
+            contentSourcesNavClass,
             blockError,
             blockLabels,
             entityKey,
             entityTypeGuid: EntityType.ContentLibrary,
             errorMessage,
+            isContentSourcesActive,
             isEditable,
+            isViewing,
             onCancelEdit,
+            onContentSourcesNav,
             onDelete,
             onEdit,
             onPropertyChanged,
             onSave,
+            onSearchFiltersNav,
             options,
             panelMode,
-            panelName
+            panelName,
+            searchFiltersNavClass
         };
     },
 
@@ -274,30 +307,101 @@ export default defineComponent({
 
 <Alert v-if="errorMessage" alertType="danger" v-text="errorMessage" />
 
-<DetailBlock v-if="!blockError"
-    v-model:mode="panelMode"
-    :name="panelName"
-    :labels="blockLabels"
-    :entityKey="entityKey"
-    :entityTypeGuid="entityTypeGuid"
-    entityTypeName="ContentLibrary"
-    :isAuditHidden="false"
-    :isBadgesVisible="true"
-    :isDeleteVisible="isEditable"
-    :isEditVisible="isEditable"
-    :isFollowVisible="false"
-    :isSecurityHidden="true"
-    @cancelEdit="onCancelEdit"
-    @delete="onDelete"
-    @edit="onEdit"
-    @save="onSave">
-    <template #view>
-        <ViewPanel :modelValue="contentLibraryViewBag" :options="options" />
-    </template>
+<v-style>
+    .content-library-detail .label-container > .label + .label {
+        margin-left: 8px;
+    }
+    .content-library-detail .content-library-trending-state > span + span {
+        margin-left: 8px;
+    }
 
-    <template #edit>
-        <EditPanel v-model="contentLibraryEditBag" :options="options" @propertyChanged="onPropertyChanged" />
-    </template>
-</DetailBlock>
+    .content-library-detail .library-source {
+        display: flex;
+        min-height: 64px;
+        border-radius: 8px;
+        border: 1px solid #c4c4c4;
+        overflow: clip;
+        align-items: center;
+    }
+
+    .content-library-detail .library-source + .library-source {
+        margin-top: 16px;
+    }
+
+    .content-library-detail .library-source > .bar {
+        width: 8px;
+        align-self: stretch;
+    }
+
+    .content-library-detail .library-source > .icon {
+        margin: 0px 8px;
+        width: 34px;
+        height: 34px;
+        border-radius: 17px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .content-library-detail .library-source > .title {
+        flex: 1 0 0;
+    }
+
+    .library-source > .title > .text {
+        font-weight: bold;
+    }
+
+    .library-source > .title > .secondary-text {
+        color: #737475;
+        font-size: 0.8em;
+    }
+
+    /* Overrides to fix panel-body targets. */
+    .content-library-detail .panel-body .library-source > .actions {
+        margin: initial;
+        border: initial;
+    }
+
+    .content-library-detail .library-source > .actions > .item-count {
+        margin-right: 12px;
+    }
+</v-style>
+
+<div v-if="!blockError">
+    <DetailBlock v-model:mode="panelMode"
+        :name="panelName"
+        :labels="blockLabels"
+        :entityKey="entityKey"
+        :entityTypeGuid="entityTypeGuid"
+        entityTypeName="ContentLibrary"
+        :isAuditHidden="false"
+        :isBadgesVisible="true"
+        :isDeleteVisible="isEditable"
+        :isEditVisible="isEditable"
+        :isFollowVisible="false"
+        :isSecurityHidden="true"
+        @cancelEdit="onCancelEdit"
+        @delete="onDelete"
+        @edit="onEdit"
+        @save="onSave">
+        <template #view>
+            <ViewPanel :modelValue="contentLibraryViewBag" :options="options" />
+        </template>
+
+        <template #edit>
+            <EditPanel v-model="contentLibraryEditBag" :options="options" @propertyChanged="onPropertyChanged" />
+        </template>
+    </DetailBlock>
+
+    <div v-if="isViewing">
+        <ul class="nav nav-pills nav-sm margin-b-md">
+            <li :class="contentSourcesNavClass" role="presentation"><a href="#" @click.prevent="onContentSourcesNav">Content Sources</a></li>
+            <li :class="searchFiltersNavClass" role="presentation"><a href="#" @click.prevent="onSearchFiltersNav">Search Filters</a></li>
+        </ul>
+
+        <ContentSources v-if="isContentSourcesActive" v-model="contentLibraryViewBag" />
+        <SearchFilters v-else />
+    </div>
+</div>
 `
 });

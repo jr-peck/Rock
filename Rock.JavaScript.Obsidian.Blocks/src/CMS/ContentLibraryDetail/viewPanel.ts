@@ -22,6 +22,7 @@ import { ValueDetailListItemBuilder } from "@Obsidian/Core/Controls/valueDetailL
 import { ValueDetailListItem } from "@Obsidian/Types/Controls/valueDetailListItem";
 import { ContentLibraryBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/contentLibraryBag";
 import { ContentLibraryDetailOptionsBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/contentLibraryDetailOptionsBag";
+import { pluralConditional } from "@Obsidian/Utility/stringUtils";
 
 export default defineComponent({
     name: "CMS.ContentLibraryDetail.ViewPanel",
@@ -76,6 +77,12 @@ export default defineComponent({
                 return valueBuilder.build();
             }
 
+            valueBuilder.addTextValue("Library Key", props.modelValue.libraryKey ?? "");
+
+            const segmentsLabel = `<span class="label label-${props.modelValue.enableSegments ? "success" : "default"}">Segments</span>`;
+            const requestFiltersLabel = `<span class="label label-${props.modelValue.enableRequestFilters ? "success" : "default"}">Request Filters</span>`;
+            valueBuilder.addHtmlValue("Personalization", `<div class="label-container">${segmentsLabel}${requestFiltersLabel}</div>`);
+
             return valueBuilder.build();
         });
 
@@ -85,6 +92,16 @@ export default defineComponent({
 
             if (!props.modelValue) {
                 return valueBuilder.build();
+            }
+
+            if (props.modelValue.trendingEnabled) {
+                const label = `<span class="label label-success">Enabled</span>`;
+                const days = `<span class="text-xs"><i class="fa fa-calendar-alt"></i> ${props.modelValue.trendingWindowDay} ${pluralConditional(props.modelValue.trendingWindowDay, "day", "days")}</span>`;
+                const items = `<span class="text-xs"><i class="fa fa-file-alt"></i> ${props.modelValue.trendingMaxItems} ${pluralConditional(props.modelValue.trendingMaxItems, "item", "items")}</span>`;
+                valueBuilder.addHtmlValue("Trending", `<div class="content-library-trending-state text-muted">${label}${days}${items}</div>`);
+            }
+            else {
+                valueBuilder.addHtmlValue("Trending", `<span class="label label-default">Disabled</span>`);
             }
 
             return valueBuilder.build();
@@ -111,7 +128,6 @@ export default defineComponent({
 
     template: `
 <fieldset>
-
     <ValueDetailList :modelValue="topValues" />
 
     <div class="row">

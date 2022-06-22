@@ -21,6 +21,7 @@
 // </copyright>
 //
 
+import { ContentSourceBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/contentSourceBag";
 import { PublicAttributeBag } from "@Obsidian/ViewModels/Utility/publicAttributeBag";
 
 export type ContentLibraryBag = {
@@ -51,14 +52,20 @@ export type ContentLibraryBag = {
     /** Gets or sets a value indicating whether trending is enabled. */
     trendingEnabled: boolean;
 
-    /** Gets or sets a the trending gravity to apply more weight to newer items. */
-    trendingGravity: number;
-
     /** Gets or sets the trending max items. This property is required. */
     trendingMaxItems: number;
 
     /** Gets or sets the trending window day. This property is required. */
     trendingWindowDay: number;
+
+    /** Gets or sets the trending gravity to apply more weight to items that are newer. */
+    trendingGravity?: number;
+
+    /**
+     * Gets or sets the sources that are currently configured for this
+     * library. This value is not used during save operations.
+     */
+    sources?: ContentSourceBag[] | null;
 
     /** Gets or sets the identifier key of this entity. */
     idKey?: string | null;
