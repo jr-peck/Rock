@@ -107,6 +107,12 @@ namespace Rock.Blocks.CMS
         {
             errorMessage = null;
 
+            if ( contentLibrary.LibraryKey.IsNullOrWhiteSpace() )
+            {
+                errorMessage = "Library Key is required.";
+                return false;
+            }
+
             return true;
         }
 
@@ -260,6 +266,8 @@ namespace Rock.Blocks.CMS
                 return false;
             }
 
+            var contentLibraryService = new ContentLibraryService( rockContext );
+
             box.IfValidProperty( nameof( box.Entity.Description ),
                 () => entity.Description = box.Entity.Description );
 
@@ -272,8 +280,11 @@ namespace Rock.Blocks.CMS
             box.IfValidProperty( nameof( box.Entity.FilterSettings ),
                 () => entity.FilterSettings = box.Entity.FilterSettings );
 
-            box.IfValidProperty( nameof( box.Entity.LibraryKey ),
-                () => entity.LibraryKey = box.Entity.LibraryKey );
+            box.IfValidProperty( nameof( box.Entity.LibraryKey ), () =>
+            {
+                var libraryId = entity.Id != 0 ? ( int? ) entity.Id : null;
+                entity.LibraryKey = contentLibraryService.GetUniqueSlug( box.Entity.LibraryKey, libraryId );
+            } );
 
             box.IfValidProperty( nameof( box.Entity.Name ),
                 () => entity.Name = box.Entity.Name );
