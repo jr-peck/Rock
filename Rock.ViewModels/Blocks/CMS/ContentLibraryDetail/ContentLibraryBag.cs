@@ -42,7 +42,7 @@ namespace Rock.ViewModels.Blocks.CMS.ContentLibraryDetail
         /// <summary>
         /// Gets or sets the filter settings.
         /// </summary>
-        public string FilterSettings { get; set; }
+        public FilterSettingsBag FilterSettings { get; set; }
 
         /// <summary>
         /// Gets or sets the last index date time.

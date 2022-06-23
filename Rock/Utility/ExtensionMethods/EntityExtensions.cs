@@ -99,93 +99,6 @@ namespace Rock
             }
         }
 
-        #endregion IEntity extensions
-
-        #region IModel Extensions
-
-        /// <summary>
-        /// Gets the <see cref="EntityAuditBag"/> that contains the information
-        /// used by the standard (Obsidian) audit detail control.
-        /// </summary>
-        /// <param name="model">The model whose audit details are requested.</param>
-        /// <returns>An instance of <see cref="EntityAuditBag"/> that represents the audit information.</returns>
-        internal static EntityAuditBag GetEntityAuditBag( this IModel model )
-        {
-            return new EntityAuditBag
-            {
-                Id = model.Id,
-                IdKey = model.IdKey,
-                Guid = model.Guid,
-                CreatedByPersonId = model.CreatedByPersonAlias?.PersonId,
-                CreatedByName = model.CreatedByPersonAlias?.Person?.FullName,
-                CreatedRelativeTime = model.CreatedDateTime?.ToRelativeDateString(),
-                ModifiedByPersonId = model.ModifiedByPersonAlias?.PersonId,
-                ModifiedByName = model.ModifiedByPersonAlias?.Person?.FullName,
-                ModifiedRelativeTime = model.ModifiedDateTime?.ToRelativeDateString()
-            };
-        }
-
-        #endregion
-
-        #region EntityType Extensions
-
-        /// <summary>
-        /// Gets the name of the friendly type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static string GetFriendlyTypeName( this Type type )
-        {
-            if ( type.Namespace == null )
-            {
-                // Anonymous types will not have a namespace
-                return "Item";
-            }
-
-            if ( type.IsDynamicProxyType() )
-            {
-                type = type.BaseType;
-            }
-
-            if ( type.Namespace.Equals( "Rock.Model" ) )
-            {
-                var entityType = EntityTypeCache.Get( type, false );
-                if ( entityType != null && entityType.FriendlyName != null )
-                {
-                    return entityType.FriendlyName;
-                }
-                else
-                {
-                    return type.Name.SplitCase();
-                }
-            }
-            else
-            {
-                return type.Name.SplitCase();
-            }
-        }
-
-        /// <summary>
-        /// Determines whether the type is a DynamicProxy of the type (type is from System.Data.Entity.DynamicProxies)
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
-        public static bool IsDynamicProxyType( this Type type )
-        {
-            if ( type != null )
-            {
-                return type.Namespace == "System.Data.Entity.DynamicProxies";
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        #endregion EntityType Extensions
-
-        #region IOrdered extensions
-
         /// <summary>
         ///     <para>
         ///     Changes the order of an entity in a list of entities by using its
@@ -279,6 +192,89 @@ namespace Rock
             return true;
         }
 
+        #endregion IEntity extensions
+
+        #region IModel Extensions
+
+        /// <summary>
+        /// Gets the <see cref="EntityAuditBag"/> that contains the information
+        /// used by the standard (Obsidian) audit detail control.
+        /// </summary>
+        /// <param name="model">The model whose audit details are requested.</param>
+        /// <returns>An instance of <see cref="EntityAuditBag"/> that represents the audit information.</returns>
+        internal static EntityAuditBag GetEntityAuditBag( this IModel model )
+        {
+            return new EntityAuditBag
+            {
+                Id = model.Id,
+                IdKey = model.IdKey,
+                Guid = model.Guid,
+                CreatedByPersonId = model.CreatedByPersonAlias?.PersonId,
+                CreatedByName = model.CreatedByPersonAlias?.Person?.FullName,
+                CreatedRelativeTime = model.CreatedDateTime?.ToRelativeDateString(),
+                ModifiedByPersonId = model.ModifiedByPersonAlias?.PersonId,
+                ModifiedByName = model.ModifiedByPersonAlias?.Person?.FullName,
+                ModifiedRelativeTime = model.ModifiedDateTime?.ToRelativeDateString()
+            };
+        }
+
         #endregion
+
+        #region EntityType Extensions
+
+        /// <summary>
+        /// Gets the name of the friendly type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static string GetFriendlyTypeName( this Type type )
+        {
+            if ( type.Namespace == null )
+            {
+                // Anonymous types will not have a namespace
+                return "Item";
+            }
+
+            if ( type.IsDynamicProxyType() )
+            {
+                type = type.BaseType;
+            }
+
+            if ( type.Namespace.Equals( "Rock.Model" ) )
+            {
+                var entityType = EntityTypeCache.Get( type, false );
+                if ( entityType != null && entityType.FriendlyName != null )
+                {
+                    return entityType.FriendlyName;
+                }
+                else
+                {
+                    return type.Name.SplitCase();
+                }
+            }
+            else
+            {
+                return type.Name.SplitCase();
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the type is a DynamicProxy of the type (type is from System.Data.Entity.DynamicProxies)
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public static bool IsDynamicProxyType( this Type type )
+        {
+            if ( type != null )
+            {
+                return type.Namespace == "System.Data.Entity.DynamicProxies";
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        #endregion EntityType Extensions
     }
 }

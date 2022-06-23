@@ -22,6 +22,7 @@
 //
 
 import { ContentSourceBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/contentSourceBag";
+import { FilterSettingsBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/filterSettingsBag";
 import { PublicAttributeBag } from "@Obsidian/ViewModels/Utility/publicAttributeBag";
 
 export type ContentLibraryBag = {
@@ -35,7 +36,7 @@ export type ContentLibraryBag = {
     enableSegments: boolean;
 
     /** Gets or sets the filter settings. */
-    filterSettings?: string | null;
+    filterSettings?: FilterSettingsBag | null;
 
     /** Gets or sets the last index date time. */
     lastIndexDateTime?: string | null;

@@ -19,65 +19,42 @@ using System.Collections.Generic;
 
 using Rock.Enums.CMS;
 
-namespace Rock.ViewModels.CMS
+namespace Rock.ViewModels.Blocks.CMS.ContentLibraryDetail
 {
-    /// <summary>
-    /// Defines the settings used by the Content Library filters as stored
-    /// in the database.
-    /// </summary>
-    public class ContentLibraryFilterSettingsBag
+    public class FilterSettingsBag
     {
         /// <summary>
         /// Gets or sets a value indicating whether full text search should be enabled.
         /// </summary>
-        /// <value>
-        ///   <c>true</c> if full text search should be enabled; otherwise, <c>false</c>.
-        /// </value>
         public bool FullTextSearchEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether searching content by year
         /// should be enabled.
         /// </summary>
-        /// <value>
-        ///   <c>true</c> if searching content by year is enabled; otherwise, <c>false</c>.
-        /// </value>
         public bool YearSearchEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets the label to use for the filter that allows an
         /// individual to search for content by a specific year.
         /// </summary>
-        /// <value>
-        /// The label to use for the Year search filter.
-        /// </value>
         public string YearSearchLabel { get; set; }
 
         /// <summary>
         /// Gets or sets the year search filter control.
         /// </summary>
-        /// <value>
-        /// The year search filter control.
-        /// </value>
         public ContentLibraryFilterControl YearSearchFilterControl { get; set; }
 
         /// <summary>
         /// Gets or sets a value that indicates if multiple selection is
         /// used by the year search filter.
         /// </summary>
-        /// <value>
-        /// A value that indicates if multiple selection is used by the year
-        /// search filter.
-        /// </value>
         public bool YearSearchFilterIsMultipleSelection { get; set; }
 
         /// <summary>
         /// Gets or sets the attributes that are enabled for filtering
         /// and indexing on the content library.
         /// </summary>
-        /// <value>
-        /// The attributes that are enable for filtering.
-        /// </value>
-        public Dictionary<string, ContentLibraryAttributeFilterSettingsBag> AttributeFilters { get; set; }
+        public List<AttributeFilterBag> AttributeFilters { get; set; }
     }
 }

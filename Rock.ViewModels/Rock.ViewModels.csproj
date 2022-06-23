@@ -44,11 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blocks\CMS\ContentLibraryDetail\AttributeFilterBag.cs" />
     <Compile Include="Blocks\CMS\ContentLibraryDetail\AvailableContentSourceBag.cs" />
-    <Compile Include="Blocks\CMS\ContentLibraryDetail\ContentChannelSourceBag.cs" />
     <Compile Include="Blocks\CMS\ContentLibraryDetail\ContentLibraryBag.cs" />
     <Compile Include="Blocks\CMS\ContentLibraryDetail\ContentLibraryDetailOptionsBag.cs" />
     <Compile Include="Blocks\CMS\ContentLibraryDetail\ContentSourceBag.cs" />
+    <Compile Include="Blocks\CMS\ContentLibraryDetail\FilterSettingsBag.cs" />
     <Compile Include="Blocks\Core\CampusDetail\CampusBag.cs" />
     <Compile Include="Blocks\Core\CampusDetail\CampusDetailOptionsBag.cs" />
     <Compile Include="Blocks\Core\CampusDetail\CampusScheduleBag.cs" />
@@ -93,7 +94,7 @@
     <Compile Include="Blocks\WorkFlow\FormBuilder\FormTemplateListItemViewModel.cs" />
     <Compile Include="Blocks\WorkFlow\FormBuilder\FormValueSourcesViewModel.cs" />
     <Compile Include="Blocks\Engagement\FlowNodeDiagramBag.cs" />
-    <Compile Include="CMS\ContentLibarySourceAdditionalSettingsBag.cs" />
+    <Compile Include="CMS\ContentLibrarySourceAdditionalSettingsBag.cs" />
     <Compile Include="CMS\ContentLibraryAttributeFilterSettingsBag.cs" />
     <Compile Include="CMS\ContentLibraryFilterSettingsBag.cs" />
     <Compile Include="Controls\ElectronicSignatureValueViewModel.cs" />

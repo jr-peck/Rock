@@ -385,7 +385,7 @@ export default defineComponent({
         flex: 1 0 0;
     }
 
-    .content-library-detail .search-filter-title {
+    .content-library-detail .search-filter-title > .title {
         font-weight: bold;
     }
 
@@ -436,7 +436,7 @@ export default defineComponent({
         </ul>
 
         <ContentSources v-if="isContentSourcesActive" v-model="contentLibraryViewBag" />
-        <SearchFilters v-else />
+        <SearchFilters v-else v-model="contentLibraryViewBag" />
     </div>
 </div>
 `

@@ -22,13 +22,9 @@
 //
 
 import { ContentLibraryFilterControl } from "@Obsidian/Enums/CMS/contentLibraryFilterControl";
-import { ContentLibraryAttributeFilterSettingsBag } from "@Obsidian/ViewModels/CMS/contentLibraryAttributeFilterSettingsBag";
+import { AttributeFilterBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/attributeFilterBag";
 
-/**
- * Defines the settings used by the Content Library filters as stored
- * in the database.
- */
-export type ContentLibraryFilterSettingsBag = {
+export type FilterSettingsBag = {
     /** Gets or sets a value indicating whether full text search should be enabled. */
     fullTextSearchEnabled: boolean;
 
@@ -57,5 +53,5 @@ export type ContentLibraryFilterSettingsBag = {
      * Gets or sets the attributes that are enabled for filtering
      * and indexing on the content library.
      */
-    attributeFilters?: Record<string, ContentLibraryAttributeFilterSettingsBag> | null;
+    attributeFilters?: AttributeFilterBag[] | null;
 };

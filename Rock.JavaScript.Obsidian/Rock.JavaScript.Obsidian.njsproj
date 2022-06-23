@@ -177,7 +177,10 @@
     <TypeScriptCompile Include="Framework\Controls\switch.ts" />
     <TypeScriptCompile Include="Framework\Controls\treeList.ts" />
     <TypeScriptCompile Include="Framework\Controls\urlLinkBox.ts" />
-    <TypeScriptCompile Include="Framework\Enums\**\*.d.ts" />
+    <TypeScriptCompile Include="Framework\Enums\CMS\contentLibraryFilterControl.d.ts" />
+    <TypeScriptCompile Include="Framework\Enums\CMS\contentLibraryFilterSelection.d.ts" />
+    <TypeScriptCompile Include="Framework\Enums\CRM\gender.d.ts" />
+    <TypeScriptCompile Include="Framework\Enums\Reporting\fieldFilterSourceType.d.ts" />
     <TypeScriptCompile Include="Framework\FieldTypes\fileField.partial.ts" />
     <TypeScriptCompile Include="Framework\FieldTypes\fileFieldComponents.ts" />
     <TypeScriptCompile Include="Framework\FieldTypes\imageField.partial.ts" />
@@ -370,11 +373,12 @@
     <TypeScriptCompile Include="Framework\Utility\util.ts" />
     <TypeScriptCompile Include="Framework\Core\Reporting\comparisonType.ts" />
     <TypeScriptCompile Include="Framework\Core\Reporting\filterExpressionType.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\attributeFilterBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\availableContentSourceBag.d.ts" />
-    <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\contentChannelSourceBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\contentLibraryBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\contentLibraryDetailOptionsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\contentSourceBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Blocks\CMS\ContentLibraryDetail\filterSettingsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Core\CampusDetail\campusBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Core\CampusDetail\campusDetailOptionsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Core\CampusDetail\campusScheduleBag.d.ts" />
@@ -396,6 +400,7 @@
     <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibarySourceAdditionalSettingsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibraryAttributeFilterSettingsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibraryFilterSettingsBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibrarySourceAdditionalSettingsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Connection\connectionRequestCountsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Controls\addressControlBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Controls\birthdayPickerBag.d.ts" />

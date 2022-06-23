@@ -15,80 +15,22 @@
 // </copyright>
 //
 
-import { computed, defineComponent, PropType, ref } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import Panel from "@Obsidian/Controls/panel";
 import RockButton from "@Obsidian/Controls/rockButton";
 import SectionHeader from "@Obsidian/Controls/sectionHeader";
 import { ContentLibraryBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/contentLibraryBag";
 import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
-
-export const SearchFilter = defineComponent({
-    name: "CMS.ContentLibraryDetail.SearchFilter",
-
-    components: {
-        RockButton
-    },
-
-    props: {
-        isEnabled: {
-            type: Boolean as PropType<boolean>,
-            default: false
-        },
-        
-        isEditable: {
-            type: Boolean as PropType<boolean>,
-            default: false
-        },
-
-        title: {
-            type: String as PropType<string>,
-            required: true
-        },
-
-        description: {
-            type: String as PropType<string>
-        },
-
-        values: {
-            type: Array as PropType<ListItemBag[]>
-        }
-    },
-
-    setup(props) {
-        return {
-        };
-    },
-
-    template: `
-<div class="search-filter-row">
-    <div class="search-filter-icon">
-        <i v-if="isEnabled" class="fa fa-check-square" style="color: var(--brand-color);"></i>
-        <i v-else class="fa fa-check-square-o" style="color: #c3c2c2;"></i>
-    </div>
-
-    <div class="search-filter-content">
-        <div class="search-filter-title">{{ title }}</div>
-        <div v-if="description" class="search-filter-description">{{ description }}</div>
-
-        <fieldset>
-            <dl v-for="value in values">
-                <dt>{{ value.text }}</dt>
-                <dd>{{ value.value }}</dd>
-            </dl>
-        </fieldset>
-    </div>
-
-    <div class="search-filter-actions">
-        <RockButton v-if="isEditable" btnSize="sm"><i class="fa fa-pencil"></i></RockButton>
-    </div>
-</div>
-`
-});
+import { ContentLibraryFilterControl } from "@Obsidian/Enums/CMS/contentLibraryFilterControl";
+import { AttributeFilterBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/attributeFilterBag";
+import SearchFilter from "./searchFilter";
+import AttributeSearchFilter from "./attributeSearchFilter";
 
 export default defineComponent({
     name: "CMS.ContentLibraryDetail.SearchFilters",
 
     components: {
+        AttributeSearchFilter,
         Panel,
         RockButton,
         SearchFilter,
@@ -110,29 +52,45 @@ export default defineComponent({
 
         // #region Computed Values
 
-        const isFullTextSearchEnabled = computed((): boolean => {
-            return false;
+        const fullTextSearchEnabled = computed((): boolean => {
+            return props.modelValue.filterSettings?.fullTextSearchEnabled ?? false;
         });
 
-        const isYearSearchEnabled = computed((): boolean => {
-            return true;
+        const yearSearchEnabled = computed((): boolean => {
+            return props.modelValue.filterSettings?.yearSearchEnabled ?? false;
+        });
+
+        const yearSearchLabel = computed((): string => {
+            return props.modelValue.filterSettings?.yearSearchLabel || "Year";
+        });
+
+        const yearSearchFilterControl = computed((): ContentLibraryFilterControl => {
+            return props.modelValue.filterSettings?.yearSearchFilterControl ?? ContentLibraryFilterControl.Pills;
+        });
+
+        const yearSearchFilterIsMultipleSelection = computed((): boolean => {
+            return props.modelValue.filterSettings?.yearSearchFilterIsMultipleSelection ?? false;
         });
 
         const yearSearchValues = computed((): ListItemBag[] => {
             return [
                 {
-                    value: "Filter Label",
-                    text: "Year"
+                    text: "Filter Label",
+                    value: yearSearchLabel.value
                 },
                 {
-                    value: "Filter Control",
-                    text: "Pills"
+                    text: "Filter Control",
+                    value: yearSearchFilterControl.value === ContentLibraryFilterControl.Dropdown ? "Dropdown" : "Pills"
                 },
                 {
-                    value: "Filter Mode",
-                    text: "Multi-Select"
+                    text: "Filter Mode",
+                    value: yearSearchFilterIsMultipleSelection.value ? "Multi-Select" : "Single-Select"
                 }
             ];
+        });
+
+        const attributeFilters = computed((): AttributeFilterBag[] => {
+            return props.modelValue.filterSettings?.attributeFilters ?? [];
         });
 
         // #endregion
@@ -146,27 +104,32 @@ export default defineComponent({
         // #endregion
 
         return {
-            isFullTextSearchEnabled,
-            isYearSearchEnabled,
+            attributeFilters,
+            fullTextSearchEnabled,
+            yearSearchEnabled,
             yearSearchValues
         };
     },
 
     template: `
 <Panel title="Search Filters">
-    <SectionHeader title="Search Filters" description="The configuration below allows you to set various ways your library can be filtered." />
+    <SectionHeader title="Search Filters"
+        description="The configuration below allows you to set various ways your library can be filtered." />
 
     <SearchFilter :isEnabled="isFullTextSearchEnabled"
-        isEditable
         title="Full Text Search"
         description="Uses the content field of the content channel item or description of an Event Item." />
 
-        <SearchFilter :isEnabled="isYearSearchEnabled"
-        isEditable
+    <SearchFilter :isEnabled="isYearSearchEnabled"
         title="Year"
         description="Uses the content channel item's start date to determine the year of the content."
         :values="yearSearchValues" />
+    
+    <SectionHeader title="Attribute Filters"
+        description="The settings below allow you to provide filters for attributes that you have configured to add to your content library."
+        class="margin-t-lg" />
+
+    <AttributeSearchFilter v-for="attribute in attributeFilters" :modelValue="attribute" />
 </Panel>
 `
-//<i class="fa fa-check-square-o" style="color: gray;"></i>  <i style="color: var(--brand-color);" class="fa fa-check-square"></i>
 });

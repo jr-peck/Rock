@@ -23,14 +23,14 @@
 
 import { Guid } from "@Obsidian/Types";
 
-/** Identifies a content channel source to be saved. */
-export type ContentChannelSourceBag = {
-    /** Gets or sets the unique identifier of the content channel. */
-    guid?: Guid | null;
-
+/**
+ * The settings that describe additional details about a content library
+ * source that will be used during indexing.
+ */
+export type ContentLibrarySourceAdditionalSettingsBag = {
     /**
-     * Gets or sets the list of attribute unique identifiers that are
-     * selected for this content channel.
+     * Gets or sets the attribute unique identifiers that are included
+     * for indexing from this source.
      */
     attributeGuids?: Guid[] | null;
 };

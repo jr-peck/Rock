@@ -22,16 +22,11 @@
 //
 
 import { ContentLibraryFilterControl } from "@Obsidian/Enums/CMS/contentLibraryFilterControl";
-import { ContentLibraryFilterSelection } from "@Obsidian/Enums/CMS/contentLibraryFilterSelection";
-import { Guid } from "@Obsidian/Types";
 
 /** The settings for a single attribute filter configured on a content library. */
 export type ContentLibraryAttributeFilterSettingsBag = {
-    /**
-     * Gets or sets the attribute key to use when accessing values
-     * for this filter.
-     */
-    attributeKey?: Guid | null;
+    /** Gets or sets a value indicating if this search filter is enabled. */
+    isEnabled: boolean;
 
     /** Gets or sets the label to use for the filter. */
     label?: string | null;
@@ -39,6 +34,6 @@ export type ContentLibraryAttributeFilterSettingsBag = {
     /** Gets or sets the search filter control. */
     filterControl: ContentLibraryFilterControl;
 
-    /** Gets or sets the selection type to use for the filter. */
-    filterSelection: ContentLibraryFilterSelection;
+    /** Gets or sets a value indicating if multiple selection is allowed. */
+    isMultipleSelection: boolean;
 };

@@ -15,8 +15,6 @@
 // </copyright>
 //
 
-using System;
-
 using Rock.Enums.CMS;
 
 namespace Rock.ViewModels.CMS
@@ -27,10 +25,12 @@ namespace Rock.ViewModels.CMS
     public class ContentLibraryAttributeFilterSettingsBag
     {
         /// <summary>
-        /// Gets or sets the attribute key to use when accessing values
-        /// for this filter.
+        /// Gets or sets a value indicating if this search filter is enabled.
         /// </summary>
-        public Guid AttributeKey { get; set; }
+        /// <value>
+        /// A value indicating if this search filter is enabled.
+        /// </value>
+        public bool IsEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets the label to use for the filter.
@@ -49,11 +49,11 @@ namespace Rock.ViewModels.CMS
         public ContentLibraryFilterControl FilterControl { get; set; }
 
         /// <summary>
-        /// Gets or sets the selection type to use for the filter.
+        /// Gets or sets a value indicating if multiple selection is allowed.
         /// </summary>
         /// <value>
-        /// The selection type to use for the filter.
+        /// A value indicating if multiple selection is allowed.
         /// </value>
-        public ContentLibraryFilterSelection FilterSelection { get; set; }
+        public bool IsMultipleSelection { get; set; }
     }
 }

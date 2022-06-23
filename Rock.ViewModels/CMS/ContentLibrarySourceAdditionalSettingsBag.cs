@@ -18,22 +18,21 @@
 using System;
 using System.Collections.Generic;
 
-namespace Rock.ViewModels.Blocks.CMS.ContentLibraryDetail
+namespace Rock.ViewModels.CMS
 {
     /// <summary>
-    /// Identifies a content channel source to be saved.
+    /// The settings that describe additional details about a content library
+    /// source that will be used during indexing.
     /// </summary>
-    public class ContentChannelSourceBag
+    public class ContentLibrarySourceAdditionalSettingsBag
     {
         /// <summary>
-        /// Gets or sets the unique identifier of the content channel.
+        /// Gets or sets the attribute unique identifiers that are included
+        /// for indexing from this source.
         /// </summary>
-        public Guid Guid { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of attribute unique identifiers that are
-        /// selected for this content channel.
-        /// </summary>
+        /// <value>
+        /// The attribute unique identifiers that are included for indexing.
+        /// </value>
         public List<Guid> AttributeGuids { get; set; }
     }
 }

@@ -28,6 +28,7 @@ using Rock.Model;
 using Rock.Security;
 using Rock.ViewModels.Blocks;
 using Rock.ViewModels.Blocks.CMS.ContentLibraryDetail;
+using Rock.ViewModels.CMS;
 using Rock.ViewModels.Utility;
 using Rock.Web.Cache;
 
@@ -188,7 +189,6 @@ namespace Rock.Blocks.CMS
                 Description = entity.Description,
                 EnableRequestFilters = entity.EnableRequestFilters,
                 EnableSegments = entity.EnableSegments,
-                FilterSettings = entity.FilterSettings,
                 LastIndexDateTime = entity.LastIndexDateTime,
                 LastIndexItemCount = entity.LastIndexItemCount,
                 LibraryKey = entity.LibraryKey,
@@ -227,6 +227,8 @@ namespace Rock.Blocks.CMS
                 .Select( s => GetContentSourceBag( s, rockContext ) )
                 .Where( s => s != null )
                 .ToList();
+
+            bag.FilterSettings = GetFilterSettingsBag( entity, rockContext );
 
             return bag;
         }
@@ -278,9 +280,6 @@ namespace Rock.Blocks.CMS
 
             box.IfValidProperty( nameof( box.Entity.EnableSegments ),
                 () => entity.EnableSegments = box.Entity.EnableSegments );
-
-            box.IfValidProperty( nameof( box.Entity.FilterSettings ),
-                () => entity.FilterSettings = box.Entity.FilterSettings );
 
             box.IfValidProperty( nameof( box.Entity.LibraryKey ), () =>
             {
@@ -477,7 +476,7 @@ namespace Rock.Blocks.CMS
 
             // Get the additional settings or a default object.
             var additionalSettings = source.AdditionalSettings
-                    .FromJsonOrNull<AdditionalSourceSettings>() ?? new AdditionalSourceSettings();
+                    .FromJsonOrNull<ContentLibrarySourceAdditionalSettingsBag>() ?? new ContentLibrarySourceAdditionalSettingsBag();
 
             // Create the bag that represents the source.
             return new ContentSourceBag
@@ -500,6 +499,155 @@ namespace Rock.Blocks.CMS
                     } )
                     .ToList()
             };
+        }
+
+        /// <summary>
+        /// Get the filter settings bag object that represents the filter
+        /// settings for the given content library.
+        /// </summary>
+        /// <param name="library">The content library that contains the filter settings.</param>
+        /// <param name="rockContext">The context to use for accessing the database.</param>
+        /// <returns>A <see cref="FilterSettingsBag"/> instance that represents the filter settings of the content library.</returns>
+        private static FilterSettingsBag GetFilterSettingsBag( ContentLibrary library, RockContext rockContext )
+        {
+            var contentChannelEntityTypeId = EntityTypeCache.GetId<ContentChannel>() ?? 0;
+            var eventCalendarEntityTypeId = EntityTypeCache.GetId<EventCalendar>() ?? 0;
+            var filterSettings = library.FilterSettings.FromJsonOrNull<ContentLibraryFilterSettingsBag>() ?? new ContentLibraryFilterSettingsBag();
+
+            // Get a list of all source attributes that are enabled
+            // for indexing.
+            var sourceAttributes = library.ContentLibrarySources
+                .SelectMany( cls =>
+                {
+                    var sourceSettings = cls.AdditionalSettings.FromJsonOrNull<ContentLibrarySourceAdditionalSettingsBag>();
+                    string name;
+
+                    if ( sourceSettings == null )
+                    {
+                        return null;
+                    }
+
+                    // Get the name of the source entity.
+                    if ( cls.EntityTypeId == contentChannelEntityTypeId )
+                    {
+                        name = new ContentChannelService( rockContext )
+                            .GetSelect( cls.EntityId, cc => cc.Name );
+                    }
+                    else if ( cls.EntityTypeId == eventCalendarEntityTypeId )
+                    {
+                        name = new EventCalendarService( rockContext )
+                            .GetSelect( cls.EntityId, cc => cc.Name );
+                    }
+                    else
+                    {
+                        name = null;
+                    }
+
+                    // No name means something is invalid about the source.
+                    if ( name.IsNullOrWhiteSpace() )
+                    {
+                        return null;
+                    }
+
+                    // Get all the attributes that are enabled for this source.
+                    var attributes = sourceSettings.AttributeGuids != null
+                        ? sourceSettings.AttributeGuids
+                            .Select( g => AttributeCache.Get( g ) )
+                            .Where( g => g != null )
+                            .ToList()
+                        : new List<AttributeCache>();
+
+                    // Return a set that associates the source name with the attribute(s).
+                    return attributes.Select( a => new Tuple<string, AttributeCache>( name, a ) );
+                } )
+                .ToList();
+
+            // Group the source attributes by attribute key and then get the
+            // attribute filter associated with that key.
+            var filters = sourceAttributes.GroupBy( a => a.Item2.Key )
+                .Select( ga => GetAttributeFilterBag( ga.ToList(), ga.Key, filterSettings.AttributeFilters?.GetValueOrNull( ga.Key ) ) )
+                .ToList();
+
+            return new FilterSettingsBag
+            {
+                FullTextSearchEnabled = filterSettings.FullTextSearchEnabled,
+                YearSearchEnabled = filterSettings.YearSearchEnabled,
+                YearSearchLabel = filterSettings.YearSearchLabel,
+                YearSearchFilterControl = filterSettings.YearSearchFilterControl,
+                YearSearchFilterIsMultipleSelection = filterSettings.YearSearchFilterIsMultipleSelection,
+                AttributeFilters = filters
+            };
+        }
+
+        /// <summary>
+        /// Gets the filter bag that represents a single attribute key.
+        /// </summary>
+        /// <param name="attributes">The attributes that represent this filter key.</param>
+        /// <param name="attributeKey">The common key to the attributes.</param>
+        /// <param name="settings">The previously saved settings for this filter or <c>null</c>.</param>
+        /// <returns>An <see cref="AttributeFilterBag"/> that represents the filter for these attributes.</returns>
+        private static AttributeFilterBag GetAttributeFilterBag( List<Tuple<string, AttributeCache>> attributes, string attributeKey, ContentLibraryAttributeFilterSettingsBag settings )
+        {
+            var firstAttribute = attributes.First();
+            bool isInconsistent = false;
+
+            // Skip the first attribute and then compare it to all the others
+            // to see if there are any inconsistencies.
+            for ( int i = 1; i < attributes.Count; i++ )
+            {
+                if ( !IsAttributeConfigurationIdentical( firstAttribute.Item2, attributes[i].Item2 ) )
+                {
+                    isInconsistent = true;
+                }
+            }
+
+            var filterBag = new AttributeFilterBag
+            {
+                AttributeKey = attributeKey,
+                AttributeName = firstAttribute.Item2.Name,
+                IsEnabled = settings?.IsEnabled ?? false,
+                IsInconsistent = isInconsistent,
+                FieldTypeName = firstAttribute.Item2.FieldType.Name,
+                FieldTypeGuid = firstAttribute.Item2.FieldType.Guid,
+                SourceNames = attributes.Select( a => a.Item1 ).ToList(),
+                FilterLabel = (settings?.Label).ToStringOrDefault( firstAttribute.Item2.Name ),
+                FilterControl = settings?.FilterControl ?? Enums.CMS.ContentLibraryFilterControl.Pills,
+                IsMultipleSelection = settings?.IsMultipleSelection ?? false
+            };
+
+            return filterBag;
+        }
+
+        /// <summary>
+        /// Checks if two attributes have identical configuration. This is a
+        /// rough comparison but should be good enough for our use case.
+        /// </summary>
+        /// <param name="attribute">The first attribute to be compared.</param>
+        /// <param name="otherAttribute">The second attribute to be compared.</param>
+        /// <returns><c>true</c> if both attributes can be considered identical; otherwise <c>false</c>.</returns>
+        private static bool IsAttributeConfigurationIdentical( AttributeCache attribute, AttributeCache otherAttribute )
+        {
+            if ( attribute.FieldTypeId != otherAttribute.FieldTypeId )
+            {
+                return false;
+            }
+
+            // Build a rough comparison of the configuration values. Ignore
+            // any blank or whitespace values, then sort by key, then concat
+            // into one giant string.
+            var attributeConfig = attribute.ConfigurationValues
+                .Where( cv => cv.Value.IsNotNullOrWhiteSpace() )
+                .OrderBy( cv => cv.Key )
+                .Select( cv => $"{cv.Key}{cv.Value}" )
+                .JoinStrings( string.Empty );
+
+            var otherAttributeConfig = otherAttribute.ConfigurationValues
+                .Where( cv => cv.Value.IsNotNullOrWhiteSpace() )
+                .OrderBy( cv => cv.Key )
+                .Select( cv => $"{cv.Key}{cv.Value}" )
+                .JoinStrings( string.Empty );
+
+            return attributeConfig == otherAttributeConfig;
         }
 
         #endregion
@@ -844,7 +992,7 @@ namespace Rock.Blocks.CMS
                 }
 
                 // Update the source with the new settings.
-                var additionalSettings = new AdditionalSourceSettings
+                var additionalSettings = new ContentLibrarySourceAdditionalSettingsBag
                 {
                     AttributeGuids = bag.Attributes?.Select( a => a.Value.AsGuid() ).ToList() ?? new List<Guid>()
                 };
@@ -948,21 +1096,5 @@ namespace Rock.Blocks.CMS
         }
 
         #endregion
-
-        /// <summary>
-        /// The structured object for the additional settings of a content
-        /// library source.
-        /// </summary>
-        private class AdditionalSourceSettings
-        {
-            /// <summary>
-            /// Gets or sets the attribute unique identifiers that are enabled
-            /// for the content source.
-            /// </summary>
-            /// <value>
-            /// The attribute unique identifiers that are enabled.
-            /// </value>
-            public List<Guid> AttributeGuids { get; set; }
-        }
     }
 }
