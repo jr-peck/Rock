@@ -178,7 +178,6 @@
     <TypeScriptCompile Include="Framework\Controls\treeList.ts" />
     <TypeScriptCompile Include="Framework\Controls\urlLinkBox.ts" />
     <TypeScriptCompile Include="Framework\Enums\CMS\contentLibraryFilterControl.d.ts" />
-    <TypeScriptCompile Include="Framework\Enums\CMS\contentLibraryFilterSelection.d.ts" />
     <TypeScriptCompile Include="Framework\Enums\CRM\gender.d.ts" />
     <TypeScriptCompile Include="Framework\Enums\Reporting\fieldFilterSourceType.d.ts" />
     <TypeScriptCompile Include="Framework\FieldTypes\fileField.partial.ts" />
