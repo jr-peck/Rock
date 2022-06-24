@@ -510,9 +510,33 @@ namespace Rock.Blocks.CMS
         /// <returns>A <see cref="FilterSettingsBag"/> instance that represents the filter settings of the content library.</returns>
         private static FilterSettingsBag GetFilterSettingsBag( ContentLibrary library, RockContext rockContext )
         {
+            var filterSettings = library.FilterSettings.FromJsonOrNull<ContentLibraryFilterSettingsBag>() ?? new ContentLibraryFilterSettingsBag();
+            var filters = GetAttributeFilters( library, filterSettings, rockContext );
+
+            return new FilterSettingsBag
+            {
+                FullTextSearchEnabled = filterSettings.FullTextSearchEnabled,
+                YearSearchEnabled = filterSettings.YearSearchEnabled,
+                YearSearchLabel = filterSettings.YearSearchLabel,
+                YearSearchFilterControl = filterSettings.YearSearchFilterControl,
+                YearSearchFilterIsMultipleSelection = filterSettings.YearSearchFilterIsMultipleSelection,
+                AttributeFilters = filters
+            };
+        }
+
+        /// <summary>
+        /// Gets the attribute filters for the content library. This is an
+        /// amalgamation of the attributes enabled on all the sources as well
+        /// as the current filter settings.
+        /// </summary>
+        /// <param name="library">The content library whose filters should be retrieved.</param>
+        /// <param name="filterSettings">The current filter settings of the library.</param>
+        /// <param name="rockContext">The context to use when accessing the database.</param>
+        /// <returns>A collection of <see cref="AttributeFilterBag"/> objects that represent the filters.</returns>
+        private static List<AttributeFilterBag> GetAttributeFilters( ContentLibrary library, ContentLibraryFilterSettingsBag filterSettings, RockContext rockContext )
+        {
             var contentChannelEntityTypeId = EntityTypeCache.GetId<ContentChannel>() ?? 0;
             var eventCalendarEntityTypeId = EntityTypeCache.GetId<EventCalendar>() ?? 0;
-            var filterSettings = library.FilterSettings.FromJsonOrNull<ContentLibraryFilterSettingsBag>() ?? new ContentLibraryFilterSettingsBag();
 
             // Get a list of all source attributes that are enabled
             // for indexing.
@@ -564,19 +588,9 @@ namespace Rock.Blocks.CMS
 
             // Group the source attributes by attribute key and then get the
             // attribute filter associated with that key.
-            var filters = sourceAttributes.GroupBy( a => a.Item2.Key )
+            return sourceAttributes.GroupBy( a => a.Item2.Key )
                 .Select( ga => GetAttributeFilterBag( ga.ToList(), ga.Key, filterSettings.AttributeFilters?.GetValueOrNull( ga.Key ) ) )
                 .ToList();
-
-            return new FilterSettingsBag
-            {
-                FullTextSearchEnabled = filterSettings.FullTextSearchEnabled,
-                YearSearchEnabled = filterSettings.YearSearchEnabled,
-                YearSearchLabel = filterSettings.YearSearchLabel,
-                YearSearchFilterControl = filterSettings.YearSearchFilterControl,
-                YearSearchFilterIsMultipleSelection = filterSettings.YearSearchFilterIsMultipleSelection,
-                AttributeFilters = filters
-            };
         }
 
         /// <summary>
@@ -1092,6 +1106,138 @@ namespace Rock.Blocks.CMS
                 rockContext.SaveChanges();
 
                 return ActionOk();
+            }
+        }
+
+        /// <summary>
+        /// Saves the filter settings for the content library.
+        /// </summary>
+        /// <param name="key">The identifier that of the content library that should be updated.</param>
+        /// <param name="box">The details about the filter settings that should be updated.</param>
+        /// <returns>A new content library bag that represents the new state of the content library.</returns>
+        [BlockAction]
+        public BlockActionResult SaveFilterSettings( string key, DetailBlockBox<FilterSettingsBag, ContentLibraryDetailOptionsBag> box )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var contentLibraryService = new ContentLibraryService( rockContext );
+
+                if ( !TryGetEntityForEditAction( key, rockContext, out var library, out var actionError, qry => qry.Include( l => l.ContentLibrarySources ) ) )
+                {
+                    return actionError;
+                }
+
+                var filterSettings = library.FilterSettings.FromJsonOrNull<ContentLibraryFilterSettingsBag>() ?? new ContentLibraryFilterSettingsBag();
+                var filters = GetAttributeFilters( library, filterSettings, rockContext );
+
+                // Update all the basic properties.
+                box.IfValidProperty( nameof( box.Entity.FullTextSearchEnabled ),
+                    () => filterSettings.FullTextSearchEnabled = box.Entity.FullTextSearchEnabled );
+
+                box.IfValidProperty( nameof( box.Entity.YearSearchEnabled ),
+                    () => filterSettings.YearSearchEnabled = box.Entity.YearSearchEnabled );
+
+                box.IfValidProperty( nameof( box.Entity.YearSearchFilterControl ),
+                    () => filterSettings.YearSearchFilterControl = box.Entity.YearSearchFilterControl );
+
+                box.IfValidProperty( nameof( box.Entity.YearSearchFilterIsMultipleSelection ),
+                    () => filterSettings.YearSearchFilterIsMultipleSelection = box.Entity.YearSearchFilterIsMultipleSelection );
+
+                box.IfValidProperty( nameof( box.Entity.YearSearchLabel ),
+                    () => filterSettings.YearSearchLabel = box.Entity.YearSearchLabel );
+
+                // Update the attribute filters.
+                var hasInvalidAttributeFilter = false;
+                box.IfValidProperty( nameof( box.Entity.AttributeFilters ),
+                    () =>
+                    {
+                        var booleanFieldTypeGuid = SystemGuid.FieldType.BOOLEAN.AsGuid();
+
+                        foreach ( var attributeFilter in box.Entity.AttributeFilters )
+                        {
+                            var filter = filters.FirstOrDefault( f => f.AttributeKey == attributeFilter.AttributeKey );
+
+                            // This should only happen if internal data changed
+                            // while they were editing, but catch it so they know
+                            // their changes were not saved.
+                            if ( filter == null )
+                            {
+                                hasInvalidAttributeFilter = true;
+                                return;
+                            }
+
+                            // Don't let them modify an inconsistent filter, but
+                            // do not throw an error because we don't know they
+                            // actually tried to change any values.
+                            if ( filter.IsInconsistent )
+                            {
+                                return;
+                            }
+
+                            if ( filterSettings.AttributeFilters == null )
+                            {
+                                filterSettings.AttributeFilters = new Dictionary<string, ContentLibraryAttributeFilterSettingsBag>();
+                            }
+
+                            // Get the existing settings or create a new one.
+                            if ( !filterSettings.AttributeFilters.TryGetValue( filter.AttributeKey, out var filterSetting ) )
+                            {
+                                filterSetting = new ContentLibraryAttributeFilterSettingsBag();
+                                filterSettings.AttributeFilters.Add( filter.AttributeKey, filterSetting );
+                            }
+
+                            filterSetting.IsEnabled = attributeFilter.IsEnabled;
+                            filterSetting.Label = attributeFilter.FilterLabel;
+
+                            if ( filter.FieldTypeGuid == booleanFieldTypeGuid )
+                            {
+                                // Just force set these values when it's a boolean.
+                                filterSetting.FilterControl = Enums.CMS.ContentLibraryFilterControl.Boolean;
+                                filterSetting.IsMultipleSelection = false;
+                            }
+                            else
+                            {
+                                // Make sure the value is valid.
+                                if ( attributeFilter.FilterControl != Enums.CMS.ContentLibraryFilterControl.Pills && attributeFilter.FilterControl != Enums.CMS.ContentLibraryFilterControl.Dropdown )
+                                {
+                                    hasInvalidAttributeFilter = true;
+                                    return;
+                                }
+
+                                filterSetting.FilterControl = attributeFilter.FilterControl;
+                                filterSetting.IsMultipleSelection = attributeFilter.IsMultipleSelection;
+                            }
+                        }
+                    } );
+
+                if ( hasInvalidAttributeFilter )
+                {
+                    return ActionBadRequest( "Invalid attribute filter." );
+                }
+
+                // Clean up any attribute filters that no longer exist.
+                var validKeys = filters.Select( f => f.AttributeKey ).ToList();
+                var keysToRemove = filterSettings.AttributeFilters.Keys
+                    .Where( k => !validKeys.Contains( k ) )
+                    .ToList();
+                foreach ( var invalidKey in keysToRemove )
+                {
+                    filterSettings.AttributeFilters.Remove( invalidKey );
+                }
+
+                library.FilterSettings = filterSettings.ToJson();
+
+                rockContext.SaveChanges();
+
+                // Send back a new box with the entity to display.
+                library.LoadAttributes( rockContext );
+
+                var newBox = new DetailBlockBox<ContentLibraryBag, ContentLibraryDetailOptionsBag>
+                {
+                    Entity = GetEntityBagForView( library, true, rockContext )
+                };
+
+                return ActionOk( newBox );
             }
         }
 

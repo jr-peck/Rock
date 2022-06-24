@@ -64,8 +64,17 @@ export default defineComponent({
         },
     },
 
-    setup() {
+    emits: {
+        "edit": () => true
+    },
+
+    setup(props, { emit }) {
+        const onEditClick = (): void => {
+            emit("edit");
+        };
+
         return {
+            onEditClick
         };
     },
 
@@ -95,7 +104,7 @@ export default defineComponent({
     </div>
 
     <div class="search-filter-actions">
-        <RockButton v-if="!isInconsistent" btnSize="sm"><i class="fa fa-pencil"></i></RockButton>
+        <RockButton v-if="!isInconsistent" btnSize="sm" @click="onEditClick"><i class="fa fa-pencil"></i></RockButton>
     </div>
 </div>
 `

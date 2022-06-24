@@ -35,7 +35,7 @@ import { ContentSourceBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibrary
 import { EntityType } from "@Obsidian/SystemGuids";
 import { updateRefValue } from "@Obsidian/Utility/component";
 import { areEqual } from "@Obsidian/Utility/guid";
-import Source from "./source";
+import Source from "./source.partial";
 
 export default defineComponent({
     name: "CMS.ContentLibraryDetail.ContentSources",
@@ -450,6 +450,7 @@ export default defineComponent({
 
 <Modal v-model="isSourceModalOpen"
     :title="sourceModalTitle"
+    class="content-source-modal"
     saveText="Save"
     @save="onSourceSave">
     <h1 v-if="!isAddingSource">{{ sourceModalEntityName }}</h1>

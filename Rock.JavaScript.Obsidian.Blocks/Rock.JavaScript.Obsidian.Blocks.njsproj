@@ -60,14 +60,14 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\CMS\contentLibraryDetail.ts" />
-    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\attributeSearchFilter.ts" />
-    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\contentSources.ts" />
-    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\editPanel.ts" />
-    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\searchFilter.ts" />
-    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\searchFilters.ts" />
-    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\source.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\attributeSearchFilter.partial.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\contentSources.partial.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\editPanel.partial.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\searchFilter.partial.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\searchFilters.partial.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\source.partial.ts" />
     <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\types.d.ts" />
-    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\viewPanel.ts" />
+    <TypeScriptCompile Include="src\CMS\ContentLibraryDetail\viewPanel.partial.ts" />
     <TypeScriptCompile Include="src\Core\attributes.ts" />
     <TypeScriptCompile Include="src\Core\campusDetail.ts" />
     <TypeScriptCompile Include="src\Core\CampusDetail\editPanel.ts" />

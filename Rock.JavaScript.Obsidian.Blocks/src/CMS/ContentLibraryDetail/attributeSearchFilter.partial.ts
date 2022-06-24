@@ -21,7 +21,7 @@ import { ContentLibraryFilterControl } from "@Obsidian/Enums/CMS/contentLibraryF
 import { AttributeFilterBag } from "@Obsidian/ViewModels/Blocks/CMS/ContentLibraryDetail/attributeFilterBag";
 import { areEqual } from "@Obsidian/Utility/guid";
 import { FieldType } from "@Obsidian/SystemGuids";
-import SearchFilter from "./searchFilter";
+import SearchFilter from "./searchFilter.partial";
 
 export default defineComponent({
     name: "CMS.ContentLibraryDetail.AttributeSearchFilter",
@@ -37,8 +37,14 @@ export default defineComponent({
             required: true
         }
     },
+
+    emits: {
+        edit: (_value: AttributeFilterBag) => true
+    },
     
-    setup(props) {
+    setup(props, { emit }) {
+        // #region Computed Values
+
         const isEnabled = computed((): boolean => {
             return props.modelValue.isEnabled;
         });
@@ -48,7 +54,7 @@ export default defineComponent({
         });
 
         const title = computed((): string => {
-            return props.modelValue.attributeName ?? "";
+            return props.modelValue.filterLabel ?? "";
         });
 
         const subtitle = computed((): string => {
@@ -87,10 +93,22 @@ export default defineComponent({
             return values;
         });
 
+        // #endregion
+
+        // #region Event Handlers
+
+        /** Event handler for the edit event of the SearchFilter control. */
+        const onEdit = (): void => {
+            emit("edit", props.modelValue);
+        };
+
+        // #endregion
+
         return {
             description,
             isEnabled,
             isInconsistent,
+            onEdit,
             subtitle,
             title,
             values
@@ -103,6 +121,7 @@ export default defineComponent({
     :title="title"
     :subtitle="subtitle"
     :description="description"
-    :values="values" />
+    :values="values"
+    @edit="onEdit" />
 `
 });
