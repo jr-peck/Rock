@@ -505,6 +505,7 @@ namespace Rock.UniversalSearch.IndexComponents
             {
                 // add all entities
                 allEntities = true;
+                entities = new List<int>();
                 var selectedEntityTypes = EntityTypeCache.All().Where( e => e.IsIndexingSupported && e.IsIndexingEnabled && e.FriendlyName != "Site" );
 
                 foreach ( var entityTypeCache in selectedEntityTypes )

@@ -253,13 +253,20 @@ namespace Rock.UniversalSearch.IndexComponents
                 mappingType = GetIndexName( document.GetType() );
             }
 
+            // Check if index already exists.
+            var existsResponse = _client.Indices.Exists( indexName );
+            if ( !existsResponse.Exists )
+            {
+                CreateIndex( document.GetType() );
+            }
+
             var indexResult = _client.IndexAsync( document, s => s.Index( indexName ) ).ContinueWith( a =>
-             {
-                 if ( a.Exception != null )
-                 {
-                     ExceptionLogService.LogException( a.Exception );
-                 }
-             } );
+            {
+                if ( a.Exception != null )
+                {
+                    ExceptionLogService.LogException( a.Exception );
+                }
+            } );
         }
 
         /// <summary>
@@ -561,9 +568,12 @@ namespace Rock.UniversalSearch.IndexComponents
                 foreach ( var match in fieldCriteria.FieldValues )
                 {
                     var searchField = searchFields.FindBySearchFieldByName( match.Field );
+
+                    // If we couldn't find an indexed search field then just
+                    // use a generic field to match.
                     if ( searchField == null )
                     {
-                        continue;
+                        searchField = new Nest.Field( match.Field );
                     }
 
                     if ( fieldCriteria.SearchType == CriteriaSearchType.Or )
