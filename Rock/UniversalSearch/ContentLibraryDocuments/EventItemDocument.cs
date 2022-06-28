@@ -36,6 +36,7 @@ namespace Rock.UniversalSearch.ContentLibraryDocuments
     /// </remarks>
     /// <seealso cref="DocumentBase" />
     [IndexName( "ContentLibrary_EventItemDocument" )]
+    [SystemGuid.EntityTypeGuid( "A62982DC-40EC-4E13-83B5-E86B9BDD44F6" )]
     internal class EventItemDocument : DocumentBase
     {
         #region Properties

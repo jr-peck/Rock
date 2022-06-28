@@ -34,6 +34,7 @@ namespace Rock.UniversalSearch.ContentLibraryDocuments
     /// </remarks>
     /// <seealso cref="DocumentBase" />
     [IndexName( "ContentLibrary_ContentChannelItemDocument" )]
+    [SystemGuid.EntityTypeGuid( "DE329653-A241-4221-B4D6-08B6C2D33730" )]
     internal class ContentChannelItemDocument : DocumentBase
     {
         #region Methods

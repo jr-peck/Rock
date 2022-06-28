@@ -36,7 +36,7 @@ namespace Rock.UniversalSearch.ContentLibraryDocuments
         /// <value>
         /// The identifier of the original entity this document represents.
         /// </value>
-        [RockIndexField( Index = IndexType.NotIndexed )]
+        [RockIndexField( Index = IndexType.NotIndexed, Type = IndexFieldType.Number )]
         public int EntityId { get; set; }
 
         /// <summary>
