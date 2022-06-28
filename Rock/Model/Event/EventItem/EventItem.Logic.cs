@@ -22,6 +22,7 @@ using System.Data.Entity;
 using System.Linq;
 using Rock.Data;
 using Rock.UniversalSearch;
+using Rock.UniversalSearch.ContentLibraryDocuments;
 using Rock.UniversalSearch.IndexModels;
 using Rock.Web.Cache;
 
@@ -253,5 +254,99 @@ namespace Rock.Model
         #endregion
 
         #endregion
+
+        #region IRockContentLibraryIndexable Methods
+
+        /// <inheritdoc/>
+        void IRockContentLibraryIndexable.IndexContentLibraryDocument( int id )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var itemEntity = new EventItemService( rockContext ).GetInclude( id, ei => ei.EventCalendarItems );
+
+                if ( itemEntity == null )
+                {
+                    return;
+                }
+
+                // Create or update any indexed documents for content library sources.
+                var eventCalendarEntityTypeId = EntityTypeCache.Get<EventCalendar>().Id;
+                var calendarIds = itemEntity.EventCalendarItems
+                    .Select( eci => eci.EventCalendarId )
+                    .ToList();
+                var sources = ContentLibrarySourceCache.All()
+                    .Where( s => s.EntityTypeId == eventCalendarEntityTypeId
+                        && calendarIds.Contains( s.EntityId ) )
+                    .ToList();
+
+                foreach ( var source in sources )
+                {
+                    var indexItem = EventItemDocument.LoadByModel( itemEntity, source );
+                    IndexContainer.IndexDocument( indexItem );
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        void IRockContentLibraryIndexable.DeleteContentLibraryDocument( int id )
+        {
+            // Delete all content channel item documents with this entity id.
+            IndexContainer.DeleteDocumentByProperty( typeof( EventItemDocument ),
+                nameof( EventItemDocument.EntityId ),
+                id );
+        }
+
+        /// <inheritdoc/>
+        void IRockContentLibraryIndexable.IndexAllContentLibraryDocuments( int? sourceId )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                // Get all the content channel identifiers that need have items
+                // in need of indexing.
+                var eventCalendarEntityTypeId = EntityTypeCache.Get<EventCalendar>().Id;
+                var sources = new ContentLibrarySourceService( rockContext ).Queryable()
+                    .Where( s => s.EntityTypeId == eventCalendarEntityTypeId
+                        && ( !sourceId.HasValue || s.Id == sourceId.Value ) );
+
+                // Create a pure-SQL join to select all content channel items that
+                // belong to one of the sources.
+                var items = new EventCalendarItemService( rockContext ).Queryable()
+                    .AsNoTracking()
+                    .Join( sources, eci => eci.EventCalendarId, s => s.EntityId, ( eci, s ) => new
+                    {
+                        Item = eci.EventItem,
+                        SourceId = s.Id
+                    } )
+                    .ToList();
+
+                foreach ( var pair in items )
+                {
+                    // Make sure the source didn't get deleted while we are processing.
+                    var source = ContentLibrarySourceCache.Get( pair.SourceId );
+                    if ( source != null )
+                    {
+                        var indexItem = EventItemDocument.LoadByModel( pair.Item, source );
+                        IndexContainer.IndexDocument( indexItem );
+                    }
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        void IRockContentLibraryIndexable.DeleteAllContentLibraryDocuments( int? sourceId )
+        {
+            if ( sourceId.HasValue )
+            {
+                IndexContainer.DeleteDocumentByProperty( typeof( ContentChannelItemDocument ),
+                    nameof( ContentChannelItemDocument.SourceId ),
+                    sourceId );
+            }
+            else
+            {
+                IndexContainer.DeleteDocumentsByType<ContentChannelItemDocument>();
+            }
+        }
+
+        #endregion IRockContentLibraryIndexable Methods
     }
 }

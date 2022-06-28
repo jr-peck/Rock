@@ -585,8 +585,8 @@ namespace Rock.Data
                 tcsPostSave.SetResult( true );
             }
 
-            var processEntityTypeIndexMsgs = new List<ProcessEntityTypeIndex.Message>();
-            var deleteEntityTypeIndexMsgs = new List<DeleteEntityTypeIndex.Message>();
+            var processIndexMsgs = new List<BusStartedTaskMessage>();
+            var deleteIndexMsgs = new List<BusStartedTaskMessage>();
             foreach ( var item in updatedItems )
             {
                 // check if this entity should be passed on for indexing
@@ -600,7 +600,7 @@ namespace Rock.Data
                             EntityId = item.Entity.Id
                         };
 
-                        deleteEntityTypeIndexMsgs.Add( deleteEntityTypeIndexMsg );
+                        deleteIndexMsgs.Add( deleteEntityTypeIndexMsg );
                     }
                     else
                     {
@@ -610,7 +610,32 @@ namespace Rock.Data
                             EntityId = item.Entity.Id
                         };
 
-                        processEntityTypeIndexMsgs.Add( processEntityTypeIndexMsg );
+                        processIndexMsgs.Add( processEntityTypeIndexMsg );
+                    }
+                }
+
+                // Check if this item might be present in a content library.
+                if ( item.Entity is IRockContentLibraryIndexable indexable )
+                {
+                    if ( item.State == EntityContextState.Detached || item.State == EntityContextState.Deleted )
+                    {
+                        var msg = new DeleteContentLibraryDocument.Message
+                        {
+                            EntityTypeId = item.Entity.TypeId,
+                            EntityId = item.Entity.Id
+                        };
+
+                        deleteIndexMsgs.Add( msg );
+                    }
+                    else
+                    {
+                        var processEntityTypeIndexMsg = new ProcessContentLibraryDocument.Message
+                        {
+                            EntityTypeId = item.Entity.TypeId,
+                            EntityId = item.Entity.Id
+                        };
+
+                        processIndexMsgs.Add( processEntityTypeIndexMsg );
                     }
                 }
 
@@ -644,15 +669,15 @@ namespace Rock.Data
             }
 
             // check if Indexing is enabled in another thread to avoid deadlock when Snapshot Isolation is turned off when the Index components upload/load attributes
-            if ( processEntityTypeIndexMsgs.Any() || deleteEntityTypeIndexMsgs.Any() )
+            if ( processIndexMsgs.Any() || deleteIndexMsgs.Any() )
             {
                 System.Threading.Tasks.Task.Run( () =>
                 {
                     var indexingEnabled = IndexContainer.GetActiveComponent() == null ? false : true;
                     if ( indexingEnabled )
                     {
-                        processEntityTypeIndexMsgs.ForEach( t => t.SendWhen( WrappedTransactionCompletedTask ) );
-                        deleteEntityTypeIndexMsgs.ForEach( t => t.SendWhen( WrappedTransactionCompletedTask ) );
+                        processIndexMsgs.ForEach( t => t.SendWhen( WrappedTransactionCompletedTask ) );
+                        deleteIndexMsgs.ForEach( t => t.SendWhen( WrappedTransactionCompletedTask ) );
                     }
                 } );
             }

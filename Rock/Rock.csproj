@@ -1375,6 +1375,7 @@
     <Compile Include="Tasks\AddPageRenameInteraction.cs" />
     <Compile Include="Tasks\AddShortLinkInteraction.cs" />
     <Compile Include="Tasks\DeleteBinaryFileAttribute.cs" />
+    <Compile Include="Tasks\DeleteContentLibraryDocument.cs" />
     <Compile Include="Tasks\DeleteEntityTypeIndex.cs" />
     <Compile Include="Tasks\DeleteInteractions.cs" />
     <Compile Include="Tasks\DeleteWorkflows.cs" />
@@ -1386,6 +1387,7 @@
     <Compile Include="Tasks\LaunchWorkflows.cs" />
     <Compile Include="Tasks\ProcessConnectionRequestActivityChange.cs" />
     <Compile Include="Tasks\ProcessConnectionRequestChange.cs" />
+    <Compile Include="Tasks\ProcessContentLibraryDocument.cs" />
     <Compile Include="Tasks\ProcesSendRegistrationNotification.cs" />
     <Compile Include="Tasks\ProcessEntityTypeBulkIndex.cs" />
     <Compile Include="Tasks\ProcessEntityTypeIndex.cs" />
@@ -1414,8 +1416,12 @@
     <Compile Include="Tv\Classes\AppleTvApplicationSettings.cs" />
     <Compile Include="Tv\Classes\ApplicationSettings.cs" />
     <Compile Include="Tv\TvHelper.cs" />
+    <Compile Include="UniversalSearch\ContentLibraryDocuments\DocumentBase.cs" />
+    <Compile Include="UniversalSearch\ContentLibraryDocuments\ContentChannelItemDocument.cs" />
+    <Compile Include="UniversalSearch\ContentLibraryDocuments\EventItemDocument.cs" />
     <Compile Include="UniversalSearch\IndexModels\Attributes\IndexNameAttribute.cs" />
     <Compile Include="UniversalSearch\IndexModels\EventItemIndex.cs" />
+    <Compile Include="UniversalSearch\IRockContentLibraryIndexable.cs" />
     <Compile Include="Utility\CodeGenFeature.cs" />
     <Compile Include="Plugin\HotFixes\143_ServerCheckinPrinterCutter2.cs" />
     <Compile Include="Plugin\HotFixes\142_AddMobileGroupFinderBlock.cs" />
