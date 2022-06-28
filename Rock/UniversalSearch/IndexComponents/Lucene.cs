@@ -1,4 +1,4 @@
-// <copyright>
+﻿// <copyright>
 // Copyright by the Spark Development Network
 //
 // Licensed under the Rock Community License (the "License");
@@ -15,6 +15,7 @@
 // </copyright>
 //
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -224,7 +225,7 @@ namespace Rock.UniversalSearch.IndexComponents
 
             foreach ( var mappingType in entityTypes )
             {
-                string mappingTypeName = mappingType.Name.ToLower();
+                string mappingTypeName = GetIndexName( mappingType );
                 if ( !_indexes.ContainsKey( mappingTypeName ) )
                 {
                     CreateIndex( mappingType );
@@ -332,7 +333,7 @@ namespace Rock.UniversalSearch.IndexComponents
         {
             if ( indexName == null )
             {
-                indexName = typeof( T ).Name.ToLower();
+                indexName = GetIndexName( typeof( T ) );
             }
 
             OpenWriter();
@@ -340,7 +341,7 @@ namespace Rock.UniversalSearch.IndexComponents
             {
                 if ( _writer != null )
                 {
-                    _writer.DeleteDocuments( new Term( "type", typeof( T ).Name.ToLower() ) );
+                    _writer.DeleteDocuments( new Term( "type", indexName.ToLower() ) );
                 }
             }
         }
@@ -355,7 +356,7 @@ namespace Rock.UniversalSearch.IndexComponents
         {
             if ( indexName == null )
             {
-                indexName = document.GetType().Name.ToLower();
+                indexName = GetIndexName( document.GetType() );
             }
 
             IndexModelBase docIndexModelBase = document as IndexModelBase;
@@ -364,7 +365,7 @@ namespace Rock.UniversalSearch.IndexComponents
             {
                 if ( _writer != null )
                 {
-                    _writer.DeleteDocuments( new Term( "index", LuceneID( document.GetType().Name.ToLower(), docIndexModelBase.Id ) ) );
+                    _writer.DeleteDocuments( new Term( "index", LuceneID( indexName.ToLower(), docIndexModelBase.Id ) ) );
                 }
             }
         }
@@ -381,7 +382,7 @@ namespace Rock.UniversalSearch.IndexComponents
             {
                 if ( _writer != null )
                 {
-                    _writer.DeleteDocuments( new Term( "index", LuceneID( documentType.Name.ToLower(), id ) ) );
+                    _writer.DeleteDocuments( new Term( "index", LuceneID( GetIndexName( documentType ), id ) ) );
                     _writer.Flush( true, true );
                     _writer.Commit();
                 }
@@ -403,7 +404,7 @@ namespace Rock.UniversalSearch.IndexComponents
                 {
                     BooleanQuery query = new BooleanQuery
                     {
-                        { new TermQuery( new Term( "type", documentType.Name.ToLower() ) ), Occur.MUST },
+                        { new TermQuery( new Term( "type", GetIndexName( documentType ) ) ), Occur.MUST },
                         { new TermQuery( new Term( propertyName, propertyValue.ToStringSafe() ) ), Occur.MUST }
                     };
 
@@ -423,7 +424,7 @@ namespace Rock.UniversalSearch.IndexComponents
             {
                 if ( _writer != null )
                 {
-                    _writer.DeleteDocuments( new Term( "type", documentType.Name.ToLower() ) );
+                    _writer.DeleteDocuments( new Term( "type", GetIndexName( documentType ) ) );
                 }
             }
         }
@@ -450,7 +451,7 @@ namespace Rock.UniversalSearch.IndexComponents
         public override IndexModelBase GetDocumentById( Type documentType, string id )
         {
             OpenReader();
-            string mappingType = documentType.Name.ToLower();
+            string mappingType = GetIndexName( documentType );
             var query = new TermQuery( new Term( "index", LuceneID( mappingType, id ) ) );
             var docs = _indexSearcher.Search( query, 1 );
 
@@ -500,37 +501,36 @@ namespace Rock.UniversalSearch.IndexComponents
             List<Type> indexModelTypes = new List<Type>();
             Dictionary<string, Analyzer> combinedFieldAnalyzers = new Dictionary<string, Analyzer>();
 
-            using ( RockContext rockContext = new RockContext() )
+            if ( entities == null || entities.Count == 0 )
             {
-                var entityTypeService = new EntityTypeService( rockContext );
-                if ( entities == null || entities.Count == 0 )
+                // add all entities
+                allEntities = true;
+                var selectedEntityTypes = EntityTypeCache.All().Where( e => e.IsIndexingSupported && e.IsIndexingEnabled && e.FriendlyName != "Site" );
+
+                foreach ( var entityTypeCache in selectedEntityTypes )
                 {
-                    // add all entities
-                    allEntities = true;
-                    var selectedEntityTypes = EntityTypeCache.All().Where( e => e.IsIndexingSupported && e.IsIndexingEnabled && e.FriendlyName != "Site" );
-
-                    foreach ( var entityTypeCache in selectedEntityTypes )
-                    {
-                        entities.Add( entityTypeCache.Id );
-                    }
+                    entities.Add( entityTypeCache.Id );
                 }
-
-                foreach ( var entityId in entities )
-                {
-                    // get entities search model name
-                    var entityType = entityTypeService.GetNoTracking( entityId );
-                    indexModelTypes.Add( entityType.IndexModelType );
-
-                    // check if this is a person model, if so we need to add two model types one for person and the other for businesses
-                    // wish there was a cleaner way to do this
-                    if ( entityType.Guid == SystemGuid.EntityType.PERSON.AsGuid() )
-                    {
-                        indexModelTypes.Add( typeof( BusinessIndex ) );
-                    }
-                }
-
-                indexModelTypes = indexModelTypes.Distinct().ToList();
             }
+
+            foreach ( var entityId in entities )
+            {
+                // get entities search model name
+                var entityType = EntityTypeCache.Get( entityId );
+                var indexModelType = entityType.IsIndexingSupported
+                    ? entityType.IndexModelType
+                    : entityType.GetEntityType();
+                indexModelTypes.Add( indexModelType );
+
+                // check if this is a person model, if so we need to add two model types one for person and the other for businesses
+                // wish there was a cleaner way to do this
+                if ( entityType.Guid == SystemGuid.EntityType.PERSON.AsGuid() )
+                {
+                    indexModelTypes.Add( typeof( BusinessIndex ) );
+                }
+            }
+
+            indexModelTypes = indexModelTypes.Distinct().ToList();
 
             CombineIndexTypes( indexModelTypes, out combinedFields, out combinedFieldAnalyzers );
 
@@ -543,7 +543,7 @@ namespace Rock.UniversalSearch.IndexComponents
                 foreach ( var modelType in indexModelTypes )
                 {
                     var modelFilter = new BooleanQuery();
-                    modelFilter.Add( new TermQuery( new Term( "type", modelType.Name.ToLower() ) ), Occur.MUST );
+                    modelFilter.Add( new TermQuery( new Term( "type", GetIndexName( modelType ) ) ), Occur.MUST );
 
                     if ( fieldCriteria != null && fieldCriteria.FieldValues?.Count > 0 )
                     {
@@ -766,7 +766,7 @@ namespace Rock.UniversalSearch.IndexComponents
         {
             try
             {
-                var indexName = documentType.Name.ToLower();
+                var indexName = GetIndexName( documentType );
 
                 object instance = Activator.CreateInstance( documentType );
 
@@ -883,12 +883,12 @@ namespace Rock.UniversalSearch.IndexComponents
                 Type documentType = document.GetType();
                 if ( indexName == null )
                 {
-                    indexName = documentType.Name.ToLower();
+                    indexName = GetIndexName( documentType );
                 }
 
                 if ( mappingType == null )
                 {
-                    mappingType = documentType.Name.ToLower();
+                    mappingType = GetIndexName( documentType );
                 }
 
                 if ( !_indexes.ContainsKey( mappingType ) )
@@ -901,9 +901,23 @@ namespace Rock.UniversalSearch.IndexComponents
                 Document doc = new Document();
                 foreach ( var typeMappingProperty in index.MappingProperties.Values )
                 {
-                    TextField textField = new TextField( typeMappingProperty.Name, documentType.GetProperty( typeMappingProperty.Name ).GetValue( document, null ).ToStringSafe().ToLower(), global::Lucene.Net.Documents.Field.Store.YES );
-                    textField.Boost = typeMappingProperty.Boost;
-                    doc.Add( textField );
+                    var propertyValue = documentType.GetProperty( typeMappingProperty.Name ).GetValue( document, null );
+
+                    if ( propertyValue is ICollection collectionProperty )
+                    {
+                        foreach ( var collectionValue in collectionProperty )
+                        {
+                            TextField textField = new TextField( typeMappingProperty.Name, collectionValue.ToStringSafe().ToLower(), global::Lucene.Net.Documents.Field.Store.YES );
+                            textField.Boost = typeMappingProperty.Boost;
+                            doc.Add( textField );
+                        }
+                    }
+                    else
+                    {
+                        TextField textField = new TextField( typeMappingProperty.Name, propertyValue.ToStringSafe().ToLower(), global::Lucene.Net.Documents.Field.Store.YES );
+                        textField.Boost = typeMappingProperty.Boost;
+                        doc.Add( textField );
+                    }
                 }
 
                 IndexModelBase docIndexModelBase = document as IndexModelBase;

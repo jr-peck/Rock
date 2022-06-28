@@ -16,9 +16,11 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 using Rock.Extension;
 using Rock.UniversalSearch.IndexModels;
+using Rock.UniversalSearch.IndexModels.Attributes;
 
 namespace Rock.UniversalSearch
 {
@@ -135,6 +137,19 @@ namespace Rock.UniversalSearch
         /// <param name="totalResultsAvailable">The total results available.</param>
         /// <returns></returns>
         public abstract List<IndexModelBase> Search( string query, SearchType searchType, List<int> entities, SearchFieldCriteria criteria, int? size, int? from, out long totalResultsAvailable );
+
+        /// <summary>
+        /// Gets the name of the index from the type. This takes into account
+        /// any custom overrides that have been applied.
+        /// </summary>
+        /// <param name="type">The type whose index name is being requested.</param>
+        /// <returns>The name to use for the index.</returns>
+        protected static string GetIndexName( Type type )
+        {
+            var indexNameAttribute = type.GetCustomAttribute<IndexNameAttribute>();
+
+            return ( indexNameAttribute?.Name ?? type.Name ).ToLower();
+        }
     }
 
     /// <summary>

@@ -245,12 +245,12 @@ namespace Rock.UniversalSearch.IndexComponents
         {
             if ( indexName == null )
             {
-                indexName = document.GetType().Name.ToLower();
+                indexName = GetIndexName( document.GetType() );
             }
 
             if ( mappingType == null )
             {
-                mappingType = document.GetType().Name.ToLower();
+                mappingType = GetIndexName( document.GetType() );
             }
 
             var indexResult = _client.IndexAsync( document, s => s.Index( indexName ) ).ContinueWith( a =>
@@ -271,7 +271,7 @@ namespace Rock.UniversalSearch.IndexComponents
         {
             if ( indexName == null )
             {
-                indexName = typeof( T ).Name.ToLower();
+                indexName = GetIndexName( typeof( T ) );
             }
 
             _client.DeleteByQueryAsync<T>( d => d.Index( indexName ).MatchAll() );
@@ -287,7 +287,7 @@ namespace Rock.UniversalSearch.IndexComponents
         {
             if ( indexName == null )
             {
-                indexName = document.GetType().Name.ToLower();
+                indexName = GetIndexName( document.GetType() );
             }
 
             _client.Delete<T>( document, d => d.Index( indexName ) );
@@ -306,7 +306,7 @@ namespace Rock.UniversalSearch.IndexComponents
                 return;
             }
 
-            var indexName = documentType.Name.ToLower();
+            var indexName = GetIndexName( documentType );
 
             // Check if index already exists.
             var existsResponse = _client.Indices.Exists( indexName );
@@ -431,7 +431,7 @@ namespace Rock.UniversalSearch.IndexComponents
         /// <param name="documentType">Type of the document.</param>
         public override void DeleteIndex( Type documentType )
         {
-            _client.Indices.Delete( documentType.Name.ToLower() );
+            _client.Indices.Delete( GetIndexName( documentType ) );
         }
 
         /// <summary>
@@ -524,8 +524,11 @@ namespace Rock.UniversalSearch.IndexComponents
                     // Get entities search model name.
                     var entityType = EntityTypeCache.Get( entityId );
                     entityTypeList.Add( entityType );
-                    indexModelTypes.Add( entityType.IndexModelType );
-                    var indexName = entityType.IndexModelType.Name.ToLower();
+                    var indexModelType = entityType.IsIndexingSupported
+                        ? entityType.IndexModelType
+                        : entityType.GetEntityType();
+                    indexModelTypes.Add( indexModelType );
+                    var indexName = GetIndexName( indexModelType );
 
                     if ( _client.Indices.Exists( indexName ).Exists )
                     {
@@ -967,7 +970,7 @@ namespace Rock.UniversalSearch.IndexComponents
 }}", propertyName, propertyValue );
 
             var response = _client.DeleteByQuery<IndexModelBase>( qd =>
-                qd.Index( documentType.Name.ToLower() ).Query( q => q.Raw( jsonSearch ) ) );
+                qd.Index( GetIndexName( documentType ) ).Query( q => q.Raw( jsonSearch ) ) );
         }
 
         /// <summary>
@@ -999,7 +1002,7 @@ namespace Rock.UniversalSearch.IndexComponents
         /// <returns></returns>
         public override IndexModelBase GetDocumentById( Type documentType, string id )
         {
-            var indexName = documentType.Name.ToLower();
+            var indexName = GetIndexName( documentType );
 
             var request = new GetRequest( indexName, id ) { };
 

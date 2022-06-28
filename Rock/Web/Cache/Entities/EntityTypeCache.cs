@@ -40,6 +40,15 @@ namespace Rock.Web.Cache
 
         #endregion
 
+        #region Private Fields
+
+        /// <summary>
+        /// The cached type this EntityTypeCache refers to.
+        /// </summary>
+        private Type _entityType = null;
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -419,7 +428,21 @@ namespace Rock.Web.Cache
         /// <returns></returns>
         public Type GetEntityType()
         {
-            return !string.IsNullOrWhiteSpace( AssemblyName ) ? Type.GetType( AssemblyName ) : null;
+            /*
+             * 2022-06-24 - dsh
+             * 
+             * Constructing a type from the AssemblyName is fast, but still
+             * takes 0.0024ms. It can also be called extremely often. On the
+             * stock Rock instance this is called 86 times for the person
+             * profile extended attributes page. Caching it can save 0.2ms
+             * per page load on some pages.
+             */
+            if ( _entityType == null )
+            {
+                _entityType = !string.IsNullOrWhiteSpace( AssemblyName ) ? Type.GetType( AssemblyName ) : null;
+            }
+
+            return _entityType;
         }
 
         /// <summary>

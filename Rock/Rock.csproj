@@ -1412,6 +1412,7 @@
     <Compile Include="Tv\Classes\AppleTvApplicationSettings.cs" />
     <Compile Include="Tv\Classes\ApplicationSettings.cs" />
     <Compile Include="Tv\TvHelper.cs" />
+    <Compile Include="UniversalSearch\IndexModels\Attributes\IndexNameAttribute.cs" />
     <Compile Include="UniversalSearch\IndexModels\EventItemIndex.cs" />
     <Compile Include="Utility\CodeGenFeature.cs" />
     <Compile Include="Plugin\HotFixes\143_ServerCheckinPrinterCutter2.cs" />
