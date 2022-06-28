@@ -20,6 +20,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
 using System.Runtime.Serialization;
 using Rock.Data;
+using Rock.Web.Cache;
 
 namespace Rock.Model
 {
@@ -30,7 +31,7 @@ namespace Rock.Model
     [Table( "ContentLibrarySource" )]
     [DataContract]
     [Rock.SystemGuid.EntityTypeGuid( Rock.SystemGuid.EntityType.CONTENT_LIBRARY_SOURCE )]
-    public partial class ContentLibrarySource : Model<ContentLibrarySource>, IOrdered
+    public partial class ContentLibrarySource : Model<ContentLibrarySource>, IOrdered, ICacheable
     {
         #region Entity Properties
 

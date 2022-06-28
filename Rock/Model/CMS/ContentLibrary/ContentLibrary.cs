@@ -22,8 +22,10 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
 using System.Runtime.Serialization;
+
 using Rock.Data;
 using Rock.Lava;
+using Rock.Web.Cache;
 
 namespace Rock.Model
 {
@@ -34,12 +36,12 @@ namespace Rock.Model
     [Table( "ContentLibrary" )]
     [DataContract]
     [Rock.SystemGuid.EntityTypeGuid( Rock.SystemGuid.EntityType.CONTENT_LIBRARY )]
-    public partial class ContentLibrary : Model<ContentLibrary>
+    public partial class ContentLibrary : Model<ContentLibrary>, ICacheable
     {
         #region Entity Properties
 
         /// <summary>
-        /// Gets or sets the name of the ContentLibrary. This property is required.
+        /// Gets or sets the name of the ContentLibrary.
         /// </summary>
         /// <value>
         /// A <see cref="System.String" /> representing the name of the ContentLibrary.
@@ -79,7 +81,7 @@ namespace Rock.Model
         public bool TrendingEnabled { get; set; }
 
         /// <summary>
-        /// Gets or sets the trending window day. This property is required.
+        /// Gets or sets the trending window day.
         /// </summary>
         /// <value>
         /// The trending window day.
@@ -89,7 +91,7 @@ namespace Rock.Model
         public int TrendingWindowDay { get; set; }
 
         /// <summary>
-        /// Gets or sets the trending max items. This property is required.
+        /// Gets or sets the trending max items.
         /// </summary>
         /// <value>
         /// The trending max items.
