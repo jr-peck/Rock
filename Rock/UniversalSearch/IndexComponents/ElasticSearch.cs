@@ -26,6 +26,8 @@ using Elasticsearch.Net;
 using Nest;
 using Nest.JsonNetSerializer;
 
+using Newtonsoft.Json.Linq;
+
 using Rock.Attribute;
 using Rock.Model;
 using Rock.UniversalSearch.IndexModels;
@@ -507,7 +509,7 @@ namespace Rock.UniversalSearch.IndexComponents
             // Leading/trailing space should not affect the query, so trim any.
             query = query.Trim();
 
-            ISearchResponse<IndexModelBase> results = null;
+            ISearchResponse<dynamic> results = null;
             List<SearchResultModel> searchResults = new List<SearchResultModel>();
             QueryContainer queryContainer = new QueryContainer();
             var searchDescriptor = new SearchDescriptor<IndexModelBase>().AllIndices();
@@ -669,7 +671,7 @@ namespace Rock.UniversalSearch.IndexComponents
                             searchDescriptor = searchDescriptor.Explain();
                         }
 
-                        results = _client.Search<IndexModelBase>( searchDescriptor );
+                        results = _client.Search<dynamic>( searchDescriptor );
                         break;
                     }
 
@@ -844,7 +846,7 @@ namespace Rock.UniversalSearch.IndexComponents
                             searchDescriptor = searchDescriptor.Explain();
                         }
 
-                        results = _client.Search<IndexModelBase>( searchDescriptor );
+                        results = _client.Search<dynamic>( searchDescriptor );
 
                         /* 04-12-2022 MDP
 
@@ -869,7 +871,7 @@ namespace Rock.UniversalSearch.IndexComponents
 
             foreach ( var hit in results.Hits )
             {
-                IndexModelBase document = hit.Source;
+                IndexModelBase document = GetStrongTypedIndexModel( hit );
                 if ( document == null )
                 {
                     continue;
@@ -888,6 +890,40 @@ namespace Rock.UniversalSearch.IndexComponents
             }
 
             return documents;
+        }
+
+        /// <summary>
+        /// Gets the strongly typed object to represent the hit result. This
+        /// will attempt to convert the object back to it's original object
+        /// type if possible, otherwise as a generic IndexModelBase.
+        /// </summary>
+        /// <param name="hit">The hit result from a query.</param>
+        /// <returns>An instance of <see cref="IndexModelBase"/> or a subclass of it, or <c>null</c> if the result could not be parsed.</returns>
+        private static IndexModelBase GetStrongTypedIndexModel( IHit<dynamic> hit )
+        {
+            if ( !( hit.Source is JObject source ) )
+            {
+                return null;
+            }
+
+            try
+            {
+                var indexModelType = Type.GetType( $"{( string ) hit.Source["IndexModelType"]}, {( string ) hit.Source["IndexModelAssembly"]}" );
+
+                if ( indexModelType != null )
+                {
+                    return ( IndexModelBase ) source.ToObject( indexModelType ); // return the source document as the derived type
+                }
+                else
+                {
+                    return source.ToObject<IndexModelBase>(); // return the source document as the base type
+                }
+            }
+            catch
+            {
+                // ignore if the result if an exception resulted (most likely cause is getting a result from a non-rock index)
+                return null;
+            }
         }
 
         /// <summary>
