@@ -39,6 +39,7 @@
                                 <Rock:FileUploader
                                     ID="fupCSVFile"
                                     runat="server"
+                                    OnFileUploaded="fupCSVFile_FileUploaded"
                                     Label="CSV File" />
                             </div>
                         </div>
@@ -69,18 +70,25 @@
                                     runat="server"
                                     Label="Previous Source Descriptions"
                                     RepeatDirection="Horizontal"
-                                    Help="If you are importing data from a source that has already been run once, select the matching description below. Otherwise, if this is a different source than those shown, chose to add a new source description." />
+                                    Help="If you are importing data from a source that has already been run once, select the matching description below. Otherwise, if this is a different source than those shown, chose to add a new source description.">
+                                    <asp:ListItem>pco</asp:ListItem>
+                                    <asp:ListItem>ccb</asp:ListItem>
+                                    <asp:ListItem>other</asp:ListItem>
+                                </Rock:RockRadioButtonList>
+                                <Rock:RockTextBox ID="tbpreviousSourceDescription" runat="server"  Style="display:none" />
+                                <br />
+                                <a id="add-source-description" href="javascript:void(0)">Add Additional Source Description</a>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div>
+                        <div id="description">
                             <h4>Required Fields </h4>
                             When uploading data about people you’ll need to include the following information. These should be separate columns on your CSV file. The name of the field doesn’t matter as you’ll be able to map it later.
                             <br />
                             <br />
                             <ol>
-                                <li>Id - Some form of unique identifer for the person. This should come from your former system.</li>
+                                <li>Id - Some form of unique identifier for the person. This should come from your former system.</li>
                                 <li>Family Id - This field should be an unique value for each family. This tells us who is in the same family.</li>
                                 <li>Family Role - This column should have the values of Adult or Child.</li>
                                 <li>First Name - The individual’s first name.</li>
@@ -116,7 +124,7 @@
                                     <br />
                                     (Married, Single)</li>
                                 <li>Birthdate - The individual’s birthdate. </li>
-                                <li>Anniversay Date - The marriage anniversary date of the individual.</li>
+                                <li>Anniversary Date - The marriage anniversary date of the individual.</li>
                                 <li>Record Status - Whether the person is active or not.
                                     <br />
                                     (Active, Inactive)</li>
@@ -129,7 +137,7 @@
                                     <br />
                                     (______)</li>
                                 <li>Home Address Street 1 - The first line of their home street address.</li>
-                                <li>Home Address Stree 2 - The second line of their home street address.</li>
+                                <li>Home Address Street 2 - The second line of their home street address.</li>
                                 <li>Home Address City - The city of their home address.</li>
                                 <li>Home Address State - The state of their home address.
                                     <br />
@@ -159,9 +167,27 @@
                             You can also choose to ignore columns on your CSV file.
                         </div>
                     </div>
-                    <div class="col-md-6" />    <%-- Pad some extra space to the right of the panel after the description text ---%>
+                    <div class="col-md-6" />
+                    <%-- Pad some extra space to the right of the panel after the description text ---%>
                 </div>
             </div>
+
+            <script>
+                $('#add-source-description')
+                    .off('click')
+                    .on('click', () => {
+                        $("#<%=(rblpreviousSourceDescription.ClientID)%>").hide()
+                        $("#<%=(tbpreviousSourceDescription.ClientID)%>").show()
+                    });
+            </script>
+
         </asp:Panel>
     </ContentTemplate>
 </asp:UpdatePanel>
+
+CSS:
+----
+
+#description {
+    background-color: coral;
+}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -23,6 +24,18 @@ namespace RockWeb.Blocks.CVSImport
         protected override void OnLoad( EventArgs e )
         {
             base.OnLoad( e );
+
+            if ( !Page.IsPostBack )
+            {
+                ListItem peopleDataTypeItem = new ListItem( "People" );
+                ddlDataType.Items.Add( peopleDataTypeItem );
+            }
+        }
+
+        protected void fupCSVFile_FileUploaded( object sender, EventArgs e )
+        {
+            var physicalCSVFile = this.Request.MapPath( fupCSVFile.UploadedContentFilePath );
+            FileInfo fileInfo = new FileInfo( physicalCSVFile );
         }
     }
 }
