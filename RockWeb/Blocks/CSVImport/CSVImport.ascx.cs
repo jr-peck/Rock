@@ -45,6 +45,7 @@ namespace RockWeb.Blocks.CVSImport
             string csvFileName = this.Request.MapPath( hfCSVFileName.Value );
             // TODO add logging
 
+            // get the headers
             using ( StreamReader csvFileStream = File.OpenText( csvFileName ) )
             {
                 CsvReader csvReader = new CsvReader( csvFileStream );
@@ -54,6 +55,18 @@ namespace RockWeb.Blocks.CVSImport
                 rptCSVHeaders.DataSource = fieldHeaders;
                 rptCSVHeaders.DataBind();
             }
+
+            // get the number of records in the csv file
+            using ( StreamReader csvFileStream = File.OpenText( csvFileName ) )
+            {
+                int recordsCount = 0;
+                while ( csvFileStream.ReadLine() != null )
+                {
+                    ++recordsCount;
+                }
+                tdRecordCount.Description = recordsCount.ToString();
+            }
+
 
             pnlFieldMappingPage.Visible = true;
             pnlLandingPage.Visible = false;
