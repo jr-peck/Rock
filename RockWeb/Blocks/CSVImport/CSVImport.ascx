@@ -10,6 +10,10 @@
             </div>
 
             <div class="panel-body">
+                <asp:HiddenField ID="hfcsvHeaders" runat="server" />
+
+                <% if ( hfcsvHeaders.Value == "" )
+                    { %>
                 <h2>Comma Separated File Import </h2>
                 The first step is to upload your comma delimited file. We’ll then allow you to map the columns to fields in Rock. The first row of your file must contain headers for each column.
 
@@ -40,11 +44,16 @@
                                     ID="fupCSVFile"
                                     runat="server"
                                     OnFileUploaded="fupCSVFile_FileUploaded"
+                                    OnFileRemoved="fupCSVFile_FileRemoved"
+                                    RootFolder="~/App_Data/SlingshotFiles"
+                                    IsBinaryFile="false"
                                     Label="CSV File" />
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
+                                <asp:HiddenField ID="hfCSVFileName" runat="server" />
+
                                 <Rock:RockCheckBox
                                     ID="cbAllowUpdatingExisting"
                                     runat="server"
@@ -56,7 +65,7 @@
 
                         <div class="row">
                             <div class="col-md-4">
-                                <Rock:BootstrapButton ID="btnStart" runat="server" CssClass="btn btn-primary" Text="Start" />
+                                <Rock:BootstrapButton ID="btnStart" runat="server" CssClass="btn btn-primary" Text="Start" OnClick="btnStart_Click" />
                             </div>
                         </div>
                         <br />
@@ -75,12 +84,14 @@
                                     <asp:ListItem>ccb</asp:ListItem>
                                     <asp:ListItem>other</asp:ListItem>
                                 </Rock:RockRadioButtonList>
-                                <Rock:RockTextBox ID="tbpreviousSourceDescription" runat="server"  Style="display:none" />
+                                <Rock:RockTextBox ID="tbpreviousSourceDescription" runat="server" Style="display: none" />
                                 <br />
                                 <a id="add-source-description" href="javascript:void(0)">Add Additional Source Description</a>
                             </div>
                         </div>
                     </div>
+
+                    <%-- The description text on the right side of the page ---%>
                     <div class="col-lg-4">
                         <div id="description">
                             <h4>Required Fields </h4>
@@ -167,9 +178,21 @@
                             You can also choose to ignore columns on your CSV file.
                         </div>
                     </div>
-                    <div class="col-md-6" />
+
                     <%-- Pad some extra space to the right of the panel after the description text ---%>
+                    <div class="col-md-6" />
                 </div>
+                <% } %>
+
+                <% else
+                    {%>
+                <h2>Field Mapping</h2>
+                We’ve uploaded your file to the server. Below is a listing of the fields you uploaded. You’ll need to map these fields to those in Rock.
+                <hr>
+
+                <Panel ID="pnlheaders" runat="server" />
+
+                <%}  %>
             </div>
 
             <script>
@@ -184,10 +207,3 @@
         </asp:Panel>
     </ContentTemplate>
 </asp:UpdatePanel>
-
-CSS:
-----
-
-#description {
-    background-color: coral;
-}
