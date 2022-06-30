@@ -531,8 +531,7 @@ namespace RockWeb.Blocks.Connection
                 {
                     // Controls will render the error messages
                     return;
-                }           
-                                
+                }
 
                 // need WrapTransaction due to Attribute saves
                 rockContext.WrapTransaction( () =>
@@ -1706,7 +1705,7 @@ namespace RockWeb.Blocks.Connection
             {
                 c.Id,
                 c.Guid,
-                WorkflowType = c.WorkflowType.Name,
+                WorkflowType = c.WorkflowTypeCache.Name,
                 Trigger = c.TriggerType.ConvertToString()
             } ).ToList();
             gWorkflows.DataBind();
@@ -1722,7 +1721,7 @@ namespace RockWeb.Blocks.Connection
             {
                 if ( connectionWorkflowList.Any() )
                 {
-                    connectionWorkflowList.OrderBy( c => c.WorkflowType.Name ).ThenBy( c => c.TriggerType.ConvertToString() ).ToList();
+                    connectionWorkflowList.OrderBy( c => c.WorkflowTypeCache.Name ).ThenBy( c => c.TriggerType.ConvertToString() ).ToList();
                 }
             }
         }
