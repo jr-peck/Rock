@@ -51,12 +51,12 @@ namespace RockWeb.Blocks.CVSImport
                 csvReader.Configuration.HasHeaderRecord = true;
                 csvReader.Read();
                 string[] fieldHeaders = csvReader.FieldHeaders;
-                hfcsvHeaders.Value = String.Join( ",", fieldHeaders );
                 rptCSVHeaders.DataSource = fieldHeaders;
                 rptCSVHeaders.DataBind();
             }
 
+            pnlFieldMappingPage.Visible = true;
+            pnlLandingPage.Visible = false;
         }
-
     }
 }
