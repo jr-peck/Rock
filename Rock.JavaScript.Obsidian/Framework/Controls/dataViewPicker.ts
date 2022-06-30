@@ -16,17 +16,20 @@
 //
 
 import { Guid } from "@Obsidian/Types";
-import { defineComponent, PropType, ref, watch } from "vue";
-import { CategoryTreeItemProvider } from "@Obsidian/Utility/treeItemProviders";
-import { updateRefValue } from "@Obsidian/Utility/component";
+import { useSecurityGrantToken } from "@Obsidian/Utility/block";
+import { standardAsyncPickerProps, updateRefValue } from "@Obsidian/Utility/component";
 import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
+import { defineComponent, PropType, ref, watch } from "vue";
+import { DataViewTreeItemProvider } from "@Obsidian/Utility/treeItemProviders";
+import RockFormField from "./rockFormField";
 import TreeItemPicker from "./treeItemPicker";
 
 export default defineComponent({
-    name: "CategoryPicker",
+    name: "DataViewPicker",
 
     components: {
-        TreeItemPicker
+        TreeItemPicker,
+        RockFormField
     },
 
     props: {
@@ -35,31 +38,12 @@ export default defineComponent({
             required: false
         },
 
-        rootCategoryGuid: {
-            type: String as PropType<Guid>
-        },
-
         entityTypeGuid: {
-            type: String as PropType<Guid>
-        },
-
-        entityTypeQualifierColumn: {
-            type: String as PropType<string>
-        },
-
-        entityTypeQualifierValue: {
-            type: String as PropType<string>
-        },
-
-        securityGrantToken: {
-            type: String as PropType<string | null>,
+            type: String as PropType<Guid>,
             required: false
         },
 
-        multiple: {
-            type: Boolean as PropType<boolean>,
-            default: false
-        }
+        ...standardAsyncPickerProps
     },
 
     emits: {
@@ -67,23 +51,21 @@ export default defineComponent({
     },
 
     setup(props, { emit }) {
+        // #region Values
+
         const internalValue = ref(props.modelValue ?? null);
+        const securityGrantToken = useSecurityGrantToken();
 
-        // Configure the item provider with our settings. These are not reactive
-        // since we don't do lazy loading so there is no point.
-        const itemProvider = new CategoryTreeItemProvider();
-        itemProvider.rootCategoryGuid = props.rootCategoryGuid;
-        itemProvider.entityTypeGuid = props.entityTypeGuid;
-        itemProvider.entityTypeQualifierColumn = props.entityTypeQualifierColumn;
-        itemProvider.entityTypeQualifierValue = props.entityTypeQualifierValue;
-        itemProvider.securityGrantToken = props.securityGrantToken;
+        const itemProvider = ref(new DataViewTreeItemProvider());
+        itemProvider.value.entityTypeGuid = props.entityTypeGuid;
+        itemProvider.value.securityGrantToken = securityGrantToken.value;
 
-        watch(() => props.securityGrantToken, () => {
-            itemProvider.securityGrantToken = props.securityGrantToken;
-        });
+        // #endregion
+
+        // #region Watchers
 
         watch(() => props.entityTypeGuid, () => {
-            itemProvider.entityTypeGuid = props.entityTypeGuid;
+            itemProvider.value.entityTypeGuid = props.entityTypeGuid;
         });
 
         watch(internalValue, () => {
@@ -94,18 +76,26 @@ export default defineComponent({
             updateRefValue(internalValue, props.modelValue ?? null);
         });
 
+        // #endregion
+
         return {
             internalValue,
             itemProvider
         };
     },
-
     template: `
 <TreeItemPicker v-model="internalValue"
     formGroupClasses="category-picker"
     iconCssClass="fa fa-folder-open"
     :provider="itemProvider"
     :multiple="multiple"
+    disableFolderSelection
 />
+
+<!--
+<BaseAsyncPicker v-model="internalValue"
+    v-bind="standardProps"
+    :items="actualItems"
+    grouped />-->
 `
 });

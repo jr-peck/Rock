@@ -15,7 +15,7 @@
 // </copyright>
 //
 
-import { Component, computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, PropType, ref, useAttrs, watch } from "vue";
+import { Component, computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, PropType, ref, watch } from "vue";
 import HighlightJs from "@Obsidian/Libs/highlightJs";
 import FieldFilterEditor from "@Obsidian/Controls/fieldFilterEditor";
 import AttributeValuesContainer from "@Obsidian/Controls/attributeValuesContainer";
@@ -91,7 +91,7 @@ import { FieldFilterSourceBag } from "@Obsidian/ViewModels/Reporting/fieldFilter
 import { PickerDisplayStyle } from "@Obsidian/Types/Controls/pickerDisplayStyle";
 import { useStore } from "@Obsidian/PageState";
 import BadgeComponentPicker from "@Obsidian/Controls/badgeComponentPicker";
-import DataViewsPicker from "@Obsidian/Controls/dataViewsPicker";
+import DataViewPicker from "@Obsidian/Controls/dataViewPicker";
 
 // #region Gallery Support
 
@@ -3142,13 +3142,13 @@ const binaryFilePickerGallery = defineComponent({
 
 
 /** Demonstrates data views picker */
-const dataViewsPickerGallery = defineComponent({
-    name: "DataViewsPickerGallery",
+const dataViewPickerGallery = defineComponent({
+    name: "DataViewPickerGallery",
     components: {
         GalleryAndResult,
         CheckBox,
         DropDownList,
-        DataViewsPicker,
+        DataViewPicker,
         NumberUpDown,
         EntityTypePicker
     },
@@ -3161,9 +3161,9 @@ const dataViewsPickerGallery = defineComponent({
             enhanceForLongLists: ref(false),
             multiple: ref(false),
             showBlankItem: ref(false),
-            value: ref({}),
-            importCode: getControlImportPath("dataViewsPicker"),
-            exampleCode: `<DataViewsPicker label="Data Views" v-model="value" />`
+            value: ref(null),
+            importCode: getControlImportPath("dataViewPicker"),
+            exampleCode: `<DataViewPicker label="Data View" v-model="value" />`
         };
     },
     template: `
@@ -3173,7 +3173,7 @@ const dataViewsPickerGallery = defineComponent({
     :exampleCode="exampleCode"
     enableReflection
 >
-    <DataViewsPicker label="Data Views"
+    <DataViewPicker label="Data Views"
         v-model="value"
         :multiple="multiple"
         :columnCount="columnCount"
@@ -3306,7 +3306,7 @@ const controlGalleryComponents: Record<string, Component> = [
     auditDetailGallery,
     binaryFileTypePickerGallery,
     binaryFilePickerGallery,
-    dataViewsPickerGallery
+    dataViewPickerGallery
 ]
     // Sort list by component name
     .sort((a, b) => a.name.localeCompare(b.name))

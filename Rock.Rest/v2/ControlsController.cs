@@ -390,6 +390,8 @@ namespace Rock.Rest.v2
                     IncludeCategoriesWithoutChildren = options.IncludeCategoriesWithoutChildren,
                     DefaultIconCssClass = options.DefaultIconCssClass,
                     IncludeInactiveItems = options.IncludeInactiveItems,
+                    ItemFilterPropertyName = options.ItemFilterPropertyName,
+                    ItemFilterPropertyValue = options.ItemFilterPropertyValue,
                     LazyLoad = options.LazyLoad,
                     SecurityGrant = grant
                 } );
@@ -438,7 +440,7 @@ namespace Rock.Rest.v2
 
         #endregion
 
-        #region Data Views Picker
+        #region Data View Picker
 
         /// <summary>
         /// Gets the child items that match the options sent in the request body.
@@ -447,47 +449,31 @@ namespace Rock.Rest.v2
         /// <param name="options">The options that describe which data views to load.</param>
         /// <returns>A collection of view models that represent the defined values.</returns>
         [HttpPost]
-        [System.Web.Http.Route( "DataViewsPickerGetDataViews" )]
+        [System.Web.Http.Route( "DataViewPickerGetDataViews" )]
         [Authenticate]
         [Rock.SystemGuid.RestActionGuid( "1E079A57-9B44-4365-9C9C-2383A9A3F45B" )]
-        public IHttpActionResult DataViewsPickerGetDataViews( DataViewsPickerGetDataViewsOptionsBag options )
+        public IHttpActionResult DataViewPickerGetDataViews( [FromBody] DataViewPickerGetDataViewsOptionsBag options )
         {
-            if (options.EntityTypeGuid == null)
-            {
-                return NotFound();
-            }
-
             using ( var rockContext = new RockContext() )
             {
-                var entityTypeId = EntityTypeCache.GetId( options.EntityTypeGuid );
+                var clientService = new CategoryClientService( rockContext, GetPerson( rockContext ) );
                 var grant = SecurityGrant.FromToken( options.SecurityGrantToken );
 
-                var allEntityFilters = new DataViewFilterService( rockContext )
-                   .Queryable().AsNoTracking()
-                   .Where( f => f.EntityTypeId == entityTypeId )
-                   .ToList();
+                var items = clientService.GetCategorizedTreeItems( new CategoryItemTreeOptions
+                {
+                    ParentGuid = options.ParentGuid,
+                    GetCategorizedItems = options.GetCategorizedItems,
+                    EntityTypeGuid = EntityTypeCache.Get<Rock.Model.DataView>().Guid,
+                    IncludeUnnamedEntityItems = options.IncludeUnnamedEntityItems,
+                    IncludeCategoriesWithoutChildren = options.IncludeCategoriesWithoutChildren,
+                    DefaultIconCssClass = options.DefaultIconCssClass,
+                    ItemFilterPropertyName = options.EntityTypeGuidFilter.HasValue ? "EntityTypeId" : null,
+                    ItemFilterPropertyValue = options.EntityTypeGuidFilter.HasValue ? EntityTypeCache.GetId( options.EntityTypeGuidFilter.Value ).ToString() : "",
+                    LazyLoad = options.LazyLoad,
+                    SecurityGrant = grant
+                } );
 
-                var list = new DataViewService( rockContext )
-                    .GetByEntityTypeId( entityTypeId.Value )
-                    .Include( "EntityType" )
-                    .Include( "Category" )
-                    .Include( "DataViewFilter" )
-                    .AsNoTracking()
-                    .Where( v => v.DataViewFilter != null )
-                    .ToList()
-                    .Where( v => 
-                        ( v.IsAuthorized( Authorization.VIEW, RockRequestContext.CurrentPerson ) || grant?.IsAccessGranted( v, Authorization.VIEW ) == true )
-                        && v.DataViewFilter.IsAuthorized( Authorization.VIEW, RockRequestContext.CurrentPerson, allEntityFilters )
-                    )
-                    .Select( v => new ListItemBag
-                    {
-                        Value = v.Guid.ToString(),
-                        Text = v.Name,
-                        Category = v.Category.ToString()
-                    } )
-                    .ToList();
-
-                return Ok( list );
+                return Ok( items );
             }
         }
 
