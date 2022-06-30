@@ -29,14 +29,6 @@ namespace RockWeb.Blocks.CVSImport
                 ListItem peopleDataTypeItem = new ListItem( "People" );
                 ddlDataType.Items.Add( peopleDataTypeItem );
             }
-            if( hfcsvHeaders.Value  != null)
-            {
-                Array.ForEach( hfcsvHeaders.Value.Split(','), header => {
-                    HtmlGenericControl headerControl = new HtmlGenericControl( "h2" );
-                    headerControl.InnerText = header;
-                    pnlheaders.Controls.Add( headerControl );
-                } );
-            }
         }
 
         protected void fupCSVFile_FileUploaded( object sender, EventArgs e )
@@ -60,15 +52,8 @@ namespace RockWeb.Blocks.CVSImport
                 csvReader.Read();
                 string[] fieldHeaders = csvReader.FieldHeaders;
                 hfcsvHeaders.Value = String.Join( ",", fieldHeaders );
-                Array.ForEach( fieldHeaders, header => {
-                    RockDropDownList rockDropDownList = new RockDropDownList();
-                    rockDropDownList.Label = header;
-                    rockDropDownList.ID = $"ddlCSVHeader{header.Replace(" ", "")}";
-
-                    HtmlGenericControl headerControl = new HtmlGenericControl( "h2" );
-                    headerControl.InnerText = header;
-                    pnlheaders.Controls.Add( rockDropDownList );
-                } );
+                rptCSVHeaders.DataSource = fieldHeaders;
+                rptCSVHeaders.DataBind();
             }
 
         }

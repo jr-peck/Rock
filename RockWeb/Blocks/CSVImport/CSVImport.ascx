@@ -190,7 +190,14 @@
                 We’ve uploaded your file to the server. Below is a listing of the fields you uploaded. You’ll need to map these fields to those in Rock.
                 <hr>
 
-                <Panel ID="pnlheaders" runat="server" />
+                <asp:Repeater ID="rptCSVHeaders" runat="server">
+                    <ItemTemplate>
+                        <Rock:RockDropDownList
+                            ID="ddlCSVHeader"
+                            runat="server"
+                            Label='<%# Container.DataItem %>' />
+                    </ItemTemplate>
+                </asp:Repeater>
 
                 <%}  %>
             </div>
