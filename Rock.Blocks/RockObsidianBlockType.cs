@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Rock.ViewModels.CMS;
 using Rock.Web.Cache;
 
 namespace Rock.Blocks
@@ -126,17 +127,20 @@ namespace Rock.Blocks
                 return BrowserNotSupportedMarkup;
             }
 
+            var config = new ObsidianBlockConfigBag
+            {
+                BlockFileUrl = BlockFileUrl,
+                RootElementId = rootElementId,
+                BlockGuid = BlockCache.Guid,
+                ConfigurationValues = GetBlockInitialization( RockClientType.Web )
+            };
+
             return
 $@"<div id=""{rootElementId}""></div>
 <script type=""text/javascript"">
 Obsidian.onReady(() => {{
     System.import('@Obsidian/Templates/rockPage.js').then(module => {{
-        module.initializeBlock({{
-            blockFileUrl: '{BlockFileUrl}',
-            rootElement: document.getElementById('{rootElementId}'),
-            blockGuid: '{BlockCache.Guid}',
-            configurationValues: {GetBlockInitialization( RockClientType.Web ).ToCamelCaseJson( false, true )}
-        }});
+        module.initializeBlock({config.ToCamelCaseJson( false, true )});
     }});
 }});
 </script>";

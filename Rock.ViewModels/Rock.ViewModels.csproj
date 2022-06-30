@@ -97,6 +97,8 @@
     <Compile Include="CMS\ContentLibrarySourceAdditionalSettingsBag.cs" />
     <Compile Include="CMS\ContentLibraryAttributeFilterSettingsBag.cs" />
     <Compile Include="CMS\ContentLibraryFilterSettingsBag.cs" />
+    <Compile Include="CMS\ObsidianBlockConfigBag.cs" />
+    <Compile Include="CMS\ObsidianBlockCustomConfigActionBag.cs" />
     <Compile Include="Controls\ElectronicSignatureValueViewModel.cs" />
     <Compile Include="Controls\FieldTypeEditorGetAvailableFieldTypesOptionsBag.cs" />
     <Compile Include="CRM\RenderedBadgeBag.cs" />

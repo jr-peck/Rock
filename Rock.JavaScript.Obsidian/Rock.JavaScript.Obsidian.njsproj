@@ -400,6 +400,8 @@
     <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibraryAttributeFilterSettingsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibraryFilterSettingsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\CMS\contentLibrarySourceAdditionalSettingsBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\CMS\obsidianBlockConfigBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\CMS\obsidianBlockCustomConfigActionBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Connection\connectionRequestCountsBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Controls\addressControlBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Controls\birthdayPickerBag.d.ts" />
