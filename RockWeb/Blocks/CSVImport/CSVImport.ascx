@@ -194,7 +194,8 @@
                     <br />
                     <br />
 
-                    <asp:Repeater ID="rptCSVHeaders" runat="server">
+                    <asp:Repeater ID="rptCSVHeaders" runat="server"
+                        OnItemDataBound="rptCSVHeaders_ItemDataBound">
                         <ItemTemplate>
                             <Rock:RockDropDownList
                                 ID="ddlCSVHeader"
