@@ -20,12 +20,22 @@ namespace RockWeb.Blocks.CVSImport
     [Rock.SystemGuid.BlockTypeGuid( "EDA8F90D-1201-4AFF-9E6D-A8F6D6F618D9" )]
     public partial class CSVImport : Rock.Web.UI.RockBlock
     {
-        private List<string> personAttributeNames;
+        private const string ROCK_ATTRIBUTES_OPTION_NAME = "Attributes";
+        private const string FIELD_OPTION_NAME = "Field";
 
-        private ListItem[] rockAttributeArray;
-        private ListItem[] properties;
+        /// <summary>
+        /// The list items the fields in the CSV can be mapped to.
+        /// </summary>
+        private ListItem[] propertiesDropDownList;
 
+        /// <summary>
+        /// The properties that should be mapped to by fields in the csv. Not having one of these fields mapped to a csv column will result in an error
+        /// </summary>
         private string[] requiredFields = { "Id", "Family Id", "Family Role", "First Name", "Last Name" };
+
+        /// <summary>
+        /// It is optional to map these properties to a column in the csv.
+        /// </summary>
         private string[] optionalFields = { "Nick Name",
             "Middle Name",
             "Suffix",
@@ -60,6 +70,8 @@ namespace RockWeb.Blocks.CVSImport
         protected override void OnInit( EventArgs e )
         {
             base.OnInit( e );
+            Array.Sort( requiredFields );
+            Array.Sort( optionalFields );
         }
 
         protected override void OnLoad( EventArgs e )
@@ -85,14 +97,7 @@ namespace RockWeb.Blocks.CVSImport
         protected void rptCSVHeaders_ItemDataBound( object sender, RepeaterItemEventArgs e )
         {
             var ddlCSVHeader = e.Item.FindControl( "ddlCSVHeader" ) as RockDropDownList;
-            ddlCSVHeader.Items.AddRange( properties );
-
-            /*this.personAttributeNames.ForEach( personAttribute =>
-            {
-                ListItem listItem = new ListItem( personAttribute );
-                listItem.Attributes["OptionGroup"] = "Rock Attributes";
-                ddlCSVHeader.Items.Add( listItem );
-            } );*/
+            ddlCSVHeader.Items.AddRange( propertiesDropDownList );
         }
 
         protected void btnStart_Click( object sender, EventArgs e )
@@ -100,50 +105,7 @@ namespace RockWeb.Blocks.CVSImport
             string csvFileName = this.Request.MapPath( hfCSVFileName.Value );
             // TODO add logging
 
-            RockContext rockContext = new RockContext();
-            int entityTypeIdPerson = EntityTypeCache.GetId<Person>().Value;
-            AttributeService attributeService = new AttributeService( rockContext );
-            /*this.personAttributeNames = attributeService.GetByEntityTypeId( entityTypeIdPerson )
-                .Select( a => a.Name )
-                .ToList();*/
-
-            this.rockAttributeArray = attributeService.GetByEntityTypeId( entityTypeIdPerson )
-                .Select( a => a.Name )
-                .AsEnumerable()
-                .Select( name => new ListItem( name ) )
-                .ToArray();
-            foreach ( ListItem rockAttribute in rockAttributeArray )
-            {
-                rockAttribute.Attributes["OptionGroup"] = "Rock Attributes";
-            }
-
-            ListItem[] requiredFieldslistItems = requiredFields.Select( name => new ListItem( name ) )
-                .ToArray();
-
-            foreach ( ListItem listItem in requiredFieldslistItems )
-            {
-                listItem.Attributes["OptionGroup"] = "Properties";
-            }
-
-            ListItem[] optionalFieldslistItems = optionalFields.Select( name => new ListItem( name ) )
-                .ToArray();
-
-            foreach ( ListItem listItem in optionalFieldslistItems )
-            {
-                listItem.Attributes["OptionGroup"] = "Properties";
-            }
-
-            this.properties = requiredFieldslistItems.Concat( optionalFieldslistItems )
-                .Concat( rockAttributeArray )
-                .ToArray();
-
-
-            /*  this.personAttributeNames.ForEach( personAttribute =>
-              {
-                  ListItem listItem = new ListItem( personAttribute );
-                  listItem.Attributes["OptionGroup"] = "Rock Attributes";
-                  this.properties.Add( listItem );
-              } );*/
+            this.propertiesDropDownList = CreateListItemsDropDown();
 
             // get the headers
             using ( StreamReader csvFileStream = File.OpenText( csvFileName ) )
@@ -173,6 +135,52 @@ namespace RockWeb.Blocks.CVSImport
 
             pnlFieldMappingPage.Visible = true;
             pnlLandingPage.Visible = false;
+        }
+
+        protected void btnImport_Click( object sender, EventArgs e )
+        {
+            
+        }
+
+        private ListItem[] CreateListItemsDropDown()
+        {
+            RockContext rockContext = new RockContext();
+            int entityTypeIdPerson = EntityTypeCache.GetId<Person>().Value;
+            AttributeService attributeService = new AttributeService( rockContext );
+
+            ListItem[] rockAttributeArray = attributeService.GetByEntityTypeId( entityTypeIdPerson )
+                .Select( a => a.Name )
+                .AsEnumerable()
+                .Select( name => new ListItem( name ) )
+                .ToArray();
+            foreach ( ListItem rockAttribute in rockAttributeArray )
+            {
+                rockAttribute.Attributes["OptionGroup"] = ROCK_ATTRIBUTES_OPTION_NAME;
+            }
+
+            ListItem[] requiredFieldslistItems = requiredFields.Select( name => new ListItem( name ) )
+                .ToArray();
+
+            foreach ( ListItem listItem in requiredFieldslistItems )
+            {
+                listItem.Attributes["OptionGroup"] = FIELD_OPTION_NAME;
+            }
+
+            ListItem[] optionalFieldslistItems = optionalFields.Select( name => new ListItem( name ) )
+                .ToArray();
+
+            foreach ( ListItem listItem in optionalFieldslistItems )
+            {
+                listItem.Attributes["OptionGroup"] = FIELD_OPTION_NAME;
+            }
+
+            ListItem[] empty = { new ListItem("") };
+
+            return empty
+                .Concat(requiredFieldslistItems)
+                .Concat( optionalFieldslistItems )
+                .Concat( rockAttributeArray )
+                .ToArray();
         }
     }
 }

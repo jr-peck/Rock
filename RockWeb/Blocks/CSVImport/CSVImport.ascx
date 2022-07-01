@@ -203,6 +203,8 @@
                                 Label='<%# Container.DataItem %>' />
                         </ItemTemplate>
                     </asp:Repeater>
+                    <Rock:BootstrapButton ID="btnImport" runat="server" CssClass="btn btn-primary" Text="Import" OnClick="btnImport_Click" />
+
                 </asp:Panel>
             </div>
 
