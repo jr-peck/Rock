@@ -71,19 +71,19 @@ export default defineComponent({
 
         // Configure the item provider with our settings. These are not reactive
         // since we don't do lazy loading so there is no point.
-        const itemProvider = new CategoryTreeItemProvider();
-        itemProvider.rootCategoryGuid = props.rootCategoryGuid;
-        itemProvider.entityTypeGuid = props.entityTypeGuid;
-        itemProvider.entityTypeQualifierColumn = props.entityTypeQualifierColumn;
-        itemProvider.entityTypeQualifierValue = props.entityTypeQualifierValue;
-        itemProvider.securityGrantToken = props.securityGrantToken;
+        const itemProvider = ref(new CategoryTreeItemProvider());
+        itemProvider.value.rootCategoryGuid = props.rootCategoryGuid;
+        itemProvider.value.entityTypeGuid = props.entityTypeGuid;
+        itemProvider.value.entityTypeQualifierColumn = props.entityTypeQualifierColumn;
+        itemProvider.value.entityTypeQualifierValue = props.entityTypeQualifierValue;
+        itemProvider.value.securityGrantToken = props.securityGrantToken;
 
         watch(() => props.securityGrantToken, () => {
-            itemProvider.securityGrantToken = props.securityGrantToken;
+            itemProvider.value.securityGrantToken = props.securityGrantToken;
         });
 
         watch(() => props.entityTypeGuid, () => {
-            itemProvider.entityTypeGuid = props.entityTypeGuid;
+            itemProvider.value.entityTypeGuid = props.entityTypeGuid;
         });
 
         watch(internalValue, () => {

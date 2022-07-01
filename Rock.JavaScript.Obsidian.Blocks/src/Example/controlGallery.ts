@@ -2671,11 +2671,22 @@ const categoryPickerGallery = defineComponent({
         GalleryAndResult,
         CheckBox,
         CategoryPicker,
-        TextBox
+        TextBox,
+        EntityTypePicker
     },
     setup() {
+        const entityType = ref<ListItemBag | null>(null);
+        const entityTypeGuid = computed(() => {
+            if (entityType?.value?.value) {
+                return entityType.value.value;
+            }
+
+            return null;
+        });
+
         return {
-            entityTypeGuid: ref(EntityType.DefinedType),
+            entityType,
+            entityTypeGuid,
             multiple: ref(false),
             value: ref(null),
             importCode: getControlImportPath("categoryPicker"),
@@ -2692,8 +2703,15 @@ const categoryPickerGallery = defineComponent({
     <CategoryPicker label="Category Picker" v-model="value" :multiple="multiple" :entityTypeGuid="entityTypeGuid" />
 
     <template #settings>
-        <CheckBox label="Multiple" v-model="multiple" />
-        <TextBox label="Entity Type Guid" v-model="entityTypeGuid" />
+
+        <div class="row">
+            <div class="col-md-6">
+                <CheckBox label="Multiple" v-model="multiple" />
+            </div>
+            <div class="col-md-6">
+                <EntityTypePicker label="For Entity Type" v-model="entityType" enhanceForLongLists showBlankItem />
+            </div>
+        </div>
 
         <p class="text-semibold font-italic">Not all options have been implemented yet.</p>
         <p>Additional props extend and are passed to the underlying <code>Rock Form Field</code>.</p>
