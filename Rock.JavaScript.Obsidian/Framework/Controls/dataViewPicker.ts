@@ -86,16 +86,10 @@ export default defineComponent({
     template: `
 <TreeItemPicker v-model="internalValue"
     formGroupClasses="category-picker"
-    iconCssClass="fa fa-folder-open"
+    iconCssClass="fa fa-filter"
     :provider="itemProvider"
     :multiple="multiple"
     disableFolderSelection
 />
-
-<!--
-<BaseAsyncPicker v-model="internalValue"
-    v-bind="standardProps"
-    :items="actualItems"
-    grouped />-->
 `
 });
