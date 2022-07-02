@@ -423,6 +423,12 @@ namespace Rock.Model
             }
             else
             {
+                if ( !string.IsNullOrWhiteSpace( location.Country ) )
+                {
+                    errorMessage = $"Incomplete Address. Country value \"{location.Country}\" is invalid.";
+                    return false;
+                }
+
                 invalidFields.Add( "Country" );
             }
 
