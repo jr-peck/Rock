@@ -187,12 +187,17 @@
                 <asp:Panel ID="pnlFieldMappingPage" runat="server" Visible="false">
                     <h2>Field Mapping</h2>
                     We’ve uploaded your file to the server. Below is a listing of the fields you uploaded. You’ll need to map these fields to those in Rock.
-                <hr>
+                    <hr>
 
                     <Rock:TermDescription ID="tdRecordCount" runat="server" Term="Record Count" />
 
                     <br />
                     <br />
+
+                    <Rock:NotificationBox ID="nbRequiredFieldsNotPresentWarning"
+                        runat="server"
+                        NotificationBoxType="Validation"
+                        Visible="false" />
 
                     <asp:Repeater ID="rptCSVHeaders" runat="server"
                         OnItemDataBound="rptCSVHeaders_ItemDataBound">
@@ -200,10 +205,16 @@
                             <Rock:RockDropDownList
                                 ID="ddlCSVHeader"
                                 runat="server"
-                                Label='<%# Container.DataItem %>' />
+                                Label='<%# Container.DataItem %>'
+                                AutoPostBack="True"
+                                OnSelectedIndexChanged="ddlCSVHeader_SelectedIndexChanged" />
                         </ItemTemplate>
                     </asp:Repeater>
-                    <Rock:BootstrapButton ID="btnImport" runat="server" CssClass="btn btn-primary" Text="Import" OnClick="btnImport_Click" />
+                    <Rock:BootstrapButton ID="btnImport"
+                        runat="server"
+                        CssClass="btn btn-primary"
+                        Text="Import"
+                        OnClick="btnImport_Click" />
 
                 </asp:Panel>
             </div>

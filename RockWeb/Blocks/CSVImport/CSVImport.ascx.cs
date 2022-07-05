@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using CsvHelper;
 using Rock.Data;
@@ -28,6 +27,8 @@ namespace RockWeb.Blocks.CVSImport
         /// </summary>
         private ListItem[] propertiesDropDownList;
 
+        private Dictionary<string, string> propertiesMapping;
+
         /// <summary>
         /// The properties that should be mapped to by fields in the csv. Not having one of these fields mapped to a csv column will result in an error
         /// </summary>
@@ -48,14 +49,14 @@ namespace RockWeb.Blocks.CVSImport
             "Gender",
             "Marital Status",
             "Birthdate",
-            "Anniversay Date",
+            "Anniversary Date",
             "Record Status",
             "Inactive Reason",
             "Is Deceased",
             "Connection Status",
             "Grade",
             "Home Address Street 1",
-            "Home Address Stree 2",
+            "Home Address Street 2",
             "Home Address City",
             "Home Address State",
             "Home Address Postal Code",
@@ -76,8 +77,8 @@ namespace RockWeb.Blocks.CVSImport
 
         protected override void OnLoad( EventArgs e )
         {
+            this.propertiesMapping = ( Dictionary<string, string> ) ViewState["PropertiesMapping"] ?? new Dictionary<string, string>();
             base.OnLoad( e );
-
             if ( !Page.IsPostBack )
             {
                 ListItem peopleDataTypeItem = new ListItem( "People" );
@@ -107,7 +108,7 @@ namespace RockWeb.Blocks.CVSImport
 
             this.propertiesDropDownList = CreateListItemsDropDown();
 
-            // get the headers
+            // get the headers -- this needs to be moved to CSVReader class
             using ( StreamReader csvFileStream = File.OpenText( csvFileName ) )
             {
                 CsvReader csvReader = new CsvReader( csvFileStream );
@@ -118,7 +119,7 @@ namespace RockWeb.Blocks.CVSImport
                 rptCSVHeaders.DataBind();
             }
 
-            // get the number of records in the csv file
+            // get the number of records in the csv file -- this needs to be moved to CSVReader class
             using ( StreamReader csvFileStream = File.OpenText( csvFileName ) )
             {
                 int recordsCount = 0;
@@ -139,7 +140,33 @@ namespace RockWeb.Blocks.CVSImport
 
         protected void btnImport_Click( object sender, EventArgs e )
         {
-            
+            bool containsAllRequiredFields = this.propertiesMapping
+                .Keys
+                .ToHashSet()
+                .IsSupersetOf( this.requiredFields );
+            if ( !containsAllRequiredFields )
+            {
+                var missingRequiredFields = requiredFields.Except( this.propertiesMapping.Keys );
+                nbRequiredFieldsNotPresentWarning.Text = "The following required fields are missing: " + string.Join(", ", missingRequiredFields );
+                nbRequiredFieldsNotPresentWarning.Visible = true;
+                return;
+            }
+        }
+
+        protected void ddlCSVHeader_SelectedIndexChanged( object sender, EventArgs e )
+        {
+            // TODO show warning.
+
+            RockDropDownList rockDropDownList = ( RockDropDownList ) sender;
+            this.propertiesMapping = ( Dictionary<string, string> ) ViewState["PropertiesMapping"] ?? new Dictionary<string, string>();
+            if ( propertiesMapping.ContainsKey( rockDropDownList.SelectedValue ) )
+            {
+                rockDropDownList.ClearSelection();
+                return;
+            }
+            propertiesMapping.Remove( rockDropDownList.LastSelectedValue ); // remove the stale entry from the dictionary.
+            propertiesMapping.Add( rockDropDownList.SelectedValue, rockDropDownList.Label );
+            ViewState["PropertiesMapping"] = propertiesMapping;
         }
 
         private ListItem[] CreateListItemsDropDown()
@@ -174,10 +201,10 @@ namespace RockWeb.Blocks.CVSImport
                 listItem.Attributes["OptionGroup"] = FIELD_OPTION_NAME;
             }
 
-            ListItem[] empty = { new ListItem("") };
+            ListItem[] emptyDefaultEntry = { new ListItem( "" ) };
 
-            return empty
-                .Concat(requiredFieldslistItems)
+            return emptyDefaultEntry
+                .Concat( requiredFieldslistItems )
                 .Concat( optionalFieldslistItems )
                 .Concat( rockAttributeArray )
                 .ToArray();
