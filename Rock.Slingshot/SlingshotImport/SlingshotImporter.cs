@@ -142,26 +142,61 @@ namespace Rock.Slingshot
             ReportProgress( 0, "Extracting Main Slingshot File..." );
             slingshotFilesDirectory.Create();
 
-            String personCsvFilePath = SlingshotDirectoryName.EnsureTrailingBackslash()
+            #region Create the intermediate CSVs
+
+            string personCsvFilePath = SlingshotDirectoryName.EnsureTrailingBackslash()
                 + ( new SlingshotCore.Model.Person() ).GetFileName();
+            string personAddressCsvFilePath = SlingshotDirectoryName.EnsureTrailingBackslash()
+                + ( new SlingshotCore.Model.PersonAddress() ).GetFileName();
+            string personPhoneCsvFilePath = SlingshotDirectoryName.EnsureTrailingBackslash()
+                + ( new SlingshotCore.Model.PersonPhone() ).GetFileName();
+            string personAttributeValueCsvFilePath = SlingshotDirectoryName.EnsureTrailingBackslash()
+                + ( new SlingshotCore.Model.PersonAttributeValue() ).GetFileName();
 
             using ( StreamWriter personCSVFileStream = new StreamWriter( personCsvFilePath, false, System.Text.Encoding.UTF8 ) )
-            using ( CsvWriter csvWriter = new CsvWriter( personCSVFileStream ) )
+            using ( CsvWriter personCSVWriter = new CsvWriter( personCSVFileStream ) )
+            using ( StreamWriter personAddressCSVFileStream = new StreamWriter( personAddressCsvFilePath, false, System.Text.Encoding.UTF8 ) )
+            using ( CsvWriter personAddressCSVWriter = new CsvWriter( personAddressCSVFileStream ) )
+            using ( StreamWriter personPhoneCSVFileStream = new StreamWriter( personPhoneCsvFilePath, false, System.Text.Encoding.UTF8 ) )
+            using ( CsvWriter personPhoneCSVWriter = new CsvWriter( personPhoneCSVFileStream ) )
+            using ( StreamWriter personAttributeValueCSVFileStream = new StreamWriter( personAttributeValueCsvFilePath, false, System.Text.Encoding.UTF8 ) )
+            using ( CsvWriter personAttributeValueCSVWriter = new CsvWriter( personAttributeValueCSVFileStream ) )
             using ( StreamReader uploadedCSVFileStream = File.OpenText( uploadedPersonCSVFileName ) )
             using ( CsvReader csvReader = new CsvReader( uploadedCSVFileStream ) )
             {
-                csvWriter.WriteHeader<SlingshotCore.Model.Person>();
+                personCSVWriter.WriteHeader<SlingshotCore.Model.Person>();
+                personAddressCSVWriter.WriteHeader<SlingshotCore.Model.PersonAddress>();
+                personPhoneCSVWriter.WriteHeader<SlingshotCore.Model.PersonPhone>();
+                personAttributeValueCSVWriter.WriteHeader<SlingshotCore.Model.PersonAttributeValue>();
+
                 foreach ( var csvEntry in csvReader.GetRecords<dynamic>().ToList() )
                 {
-                    SlingshotCore.Model.Person person = PersonCSVMapper.map( csvEntry, headerMapper );
+                    IDictionary<string, object> csvEntryLookup = ( IDictionary<string, object> ) csvEntry;
+                    SlingshotCore.Model.Person person = PersonCSVMapper.Map( csvEntryLookup, headerMapper );
+                    SlingshotCore.Model.PersonAddress personAddress = PersonAddressCSVMapper.Map( csvEntryLookup, headerMapper );
+                    List<SlingshotCore.Model.PersonPhone> personPhones = PersonPhoneCSVMapper.Map( csvEntryLookup, headerMapper );
+                    List<SlingshotCore.Model.PersonAttributeValue> personAttributeValues = PersonAttributeValueCSVMapper
+                        .Map( csvEntryLookup, headerMapper );
 
-                    if(person.FamilyId == 0) // discard the entries which are invalid
+                  /*  if ( person.FamilyId == 0 || personAddress.Country == null ) // discard the entries which are invalid
                     {
                         continue;
-                    }
-                    csvWriter.WriteRecord<SlingshotCore.Model.Person>( person );
+                    }*/
+
+                    personCSVWriter.WriteRecord( person );
+                    personAddressCSVWriter.WriteRecord( personAddress );
+                    personPhones.ForEach( personPhone =>
+                    {
+                        personPhoneCSVWriter.WriteRecord( personPhone );
+                    } );
+                    personAttributeValues.ForEach( personAttributeValue =>
+                    {
+                        personAttributeValueCSVWriter.WriteRecord( personAttributeValue );
+                    } );
                 }
             }
+
+            #endregion Create the intermediate CSVs
 
             BulkImporter = new BulkImporter();
             BulkImporter.OnProgress = BulkImporter_OnProgress;

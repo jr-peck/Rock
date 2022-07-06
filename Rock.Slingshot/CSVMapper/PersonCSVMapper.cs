@@ -4,10 +4,9 @@ using Rock;
 
 public class PersonCSVMapper
 {
-    public static Slingshot.Core.Model.Person map( dynamic csvEntry, Dictionary<string, string> csvHeaderMapper )
+    public static Slingshot.Core.Model.Person Map( IDictionary<string, object> csvEntryLookup, Dictionary<string, string> csvHeaderMapper )
     {
         var person = new Slingshot.Core.Model.Person();
-        IDictionary<string, object> csvEntryLookup = ( IDictionary<string, object> ) csvEntry;
 
         #region Required Fields
 

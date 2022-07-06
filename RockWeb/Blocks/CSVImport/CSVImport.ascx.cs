@@ -156,7 +156,7 @@ namespace RockWeb.Blocks.CVSImport
             }
             var personCSVFileName = this.Request.MapPath( fupCSVFile.UploadedContentFilePath );
             var slingshotImporter = new SlingshotImporter( personCSVFileName, tbSourceDescription.Text, this.propertiesMapping );
-            slingshotImporter.DoImport();
+            // slingshotImporter.DoImport();
         }
 
         protected void ddlCSVHeader_SelectedIndexChanged( object sender, EventArgs e )
@@ -176,6 +176,7 @@ namespace RockWeb.Blocks.CVSImport
 
         private ListItem[] CreateListItemsDropDown()
         {
+            // can this be moved to the Attribute Service - It is getting duplicated in PersonAttribute??
             RockContext rockContext = new RockContext();
             int entityTypeIdPerson = EntityTypeCache.GetId<Person>().Value;
             AttributeService attributeService = new AttributeService( rockContext );
