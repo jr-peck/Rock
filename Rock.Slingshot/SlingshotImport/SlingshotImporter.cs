@@ -153,13 +153,7 @@ namespace Rock.Slingshot
                 csvWriter.WriteHeader<SlingshotCore.Model.Person>();
                 foreach ( var csvEntry in csvReader.GetRecords<dynamic>().ToList() )
                 {
-                    IDictionary<string, object> lookup = ( IDictionary<string, object> ) csvEntry;
-                    SlingshotCore.Model.Person person = new SlingshotCore.Model.Person();
-                    person.Id = lookup[headerMapper["Id"]].ToIntSafe();
-                    person.FamilyId = lookup[headerMapper["Family Id"]].ToIntSafe();
-                    person.FamilyRole = ( SlingshotCore.Model.FamilyRole ) Enum.Parse( typeof( SlingshotCore.Model.FamilyRole ), lookup[headerMapper["Family Role"]].ToStringSafe() );
-                    person.FirstName = lookup[headerMapper["First Name"]].ToStringSafe();
-                    person.LastName = lookup[headerMapper["Last Name"]].ToStringSafe();
+                    SlingshotCore.Model.Person person = PersonCSVMapper.map( csvEntry, headerMapper );
 
                     if(person.FamilyId == 0) // discard the entries which are invalid
                     {

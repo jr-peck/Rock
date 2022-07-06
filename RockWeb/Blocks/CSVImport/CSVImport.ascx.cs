@@ -33,11 +33,13 @@ namespace RockWeb.Blocks.CVSImport
         /// <summary>
         /// The properties that should be mapped to by fields in the csv. Not having one of these fields mapped to a csv column will result in an error
         /// </summary>
+        /// Is there a way to declare this as a global constant? They are in the Rock.Slingshot.PersonCSVMapper
         private string[] requiredFields = { "Id", "Family Id", "Family Role", "First Name", "Last Name" };
 
         /// <summary>
         /// It is optional to map these properties to a column in the csv.
         /// </summary>
+        /// Is there a way to declare this as a global constant? They are in the Rock.Slingshot.PersonCSVMapper
         private string[] optionalFields = { "Nick Name",
             "Middle Name",
             "Suffix",
