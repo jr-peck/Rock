@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Humanizer;
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
@@ -758,25 +759,34 @@ Because the contents of this setting will be rendered inside a &lt;ul&gt; elemen
 
             if ( Person.BirthDate.HasValue )
             {
-                var formattedAge = Person.FormatAge();
-                if ( formattedAge.IsNotNullOrWhiteSpace() )
+                if ( Person.BirthYear.HasValue && Person.BirthYear != DateTime.MinValue.Year )
                 {
-                    formattedAge += " old";
-                }
+                    var formattedAge = Person.FormatAge();
+                    if ( formattedAge.IsNotNullOrWhiteSpace() )
+                    {
+                        formattedAge += " old";
+                    }
 
-                var birthdateText = ( Person.BirthYear.HasValue && Person.BirthYear != DateTime.MinValue.Year ) ? Person.BirthDate.Value.ToShortDateString() : Person.BirthDate.Value.ToMonthDayString();
-                lAge.Text = $"<dt>{formattedAge}</dt><dd>{birthdateText}</dd>";
+                    var birthdateText = Person.BirthDate.Value.ToShortDateString();
+                    lAge.Text = $"<dt>{formattedAge}</dt><dd>{birthdateText}</dd>";
+                }
+                else
+                {
+                    var birthdateText = Person.BirthDate.Value.ToString("MMM d");
+                    lAge.Text = $"<dt>{birthdateText}</dt><dd>Birthdate</dd>";
+
+                }
             }
 
             if ( Person.AnniversaryDate.HasValue && GetAttributeValue( AttributeKey.DisplayAnniversaryDate ).AsBoolean() )
             {
-                lMaritalStatus.Text = $"<dt>{Person.MaritalStatusValueId.DefinedValue()} {Person.AnniversaryDate.Value.Age()} yrs</dt><dd>{Person.AnniversaryDate.Value.ToMonthDayString()}</dd>";
+                lMaritalStatus.Text = $"<dt>{Person.MaritalStatusValueId.DefinedValue()} {Person.AnniversaryDate.Value.Humanize().Replace( "ago", "" )}</dt><dd>{Person.AnniversaryDate.Value.ToShortDateString()}</dd>";
             }
             else
             {
                 if ( Person.MaritalStatusValueId.HasValue )
                 {
-                    lMaritalStatus.Text = $"<dt>{Person.MaritalStatusValueId.DefinedValue()}</dt>";
+                    lMaritalStatus.Text = $@"<dt>{Person.MaritalStatusValueId.DefinedValue()}</dt><dd class=""d-none"">Marital Status</dd>";
                 }
             }
 
