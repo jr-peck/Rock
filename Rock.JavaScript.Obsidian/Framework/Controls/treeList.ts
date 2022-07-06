@@ -88,12 +88,17 @@ const treeItem = defineComponent({
 
         /** The CSS class value to use for the item name. */
         const itemNameClass = computed((): string => {
+            const classes = ["rocktree-name"];
+
             if (props.item.value && props.modelValue.includes(props.item.value)) {
-                return "rocktree-name selected";
+                classes.push("selected");
             }
-            else {
-                return "rocktree-name";
+
+            if (!props.item.isActive) {
+                classes.push("is-inactive");
             }
+
+            return classes.join(" ");
         });
 
         /**

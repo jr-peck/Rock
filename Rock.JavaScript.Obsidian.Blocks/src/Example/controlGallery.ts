@@ -93,6 +93,7 @@ import { useStore } from "@Obsidian/PageState";
 import BadgeComponentPicker from "@Obsidian/Controls/badgeComponentPicker";
 import Modal from "@Obsidian/Controls/modal";
 import DataViewPicker from "@Obsidian/Controls/dataViewPicker";
+import WorkflowTypePicker from "@Obsidian/Controls/workflowTypePicker";
 
 // #region Gallery Support
 
@@ -3173,13 +3174,8 @@ const dataViewPickerGallery = defineComponent({
     },
     setup() {
         return {
-            columnCount: ref(0),
-            displayStyle: ref(PickerDisplayStyle.Auto),
-            displayStyleItems,
             entityTypeGuid: ref(null),
-            enhanceForLongLists: ref(false),
             multiple: ref(false),
-            showBlankItem: ref(false),
             value: ref(null),
             importCode: getControlImportPath("dataViewPicker"),
             exampleCode: `<DataViewPicker label="Data View" v-model="value" />`
@@ -3195,9 +3191,6 @@ const dataViewPickerGallery = defineComponent({
     <DataViewPicker label="Data Views"
         v-model="value"
         :multiple="multiple"
-        :columnCount="columnCount"
-        :enhanceForLongLists="enhanceForLongLists"
-        :displayStyle="displayStyle"
         :showBlankItem="showBlankItem"
         :entityTypeGuid="entityTypeGuid?.value" />
     <template #settings>
@@ -3206,21 +3199,54 @@ const dataViewPickerGallery = defineComponent({
                 <CheckBox label="Multiple" v-model="multiple" />
             </div>
             <div class="col-md-4">
-                <CheckBox label="Enhance For Long Lists" v-model="enhanceForLongLists" />
-            </div>
-            <div class="col-md-4">
-                <CheckBox label="Show Blank Item" v-model="showBlankItem" />
+                <EntityTypePicker label="For Entity Type" v-model="entityTypeGuid" enhanceForLongLists showBlankItem />
             </div>
         </div>
+    </template>
+</GalleryAndResult>`
+});
+
+
+/** Demonstrates workflow type picker */
+const workflowTypePickerGallery = defineComponent({
+    name: "WorkflowTypePickerGallery",
+    components: {
+        GalleryAndResult,
+        CheckBox,
+        DropDownList,
+        WorkflowTypePicker,
+        NumberUpDown,
+        EntityTypePicker
+    },
+    setup() {
+        return {
+            includeInactiveItems: ref(false),
+            multiple: ref(false),
+            value: ref(null),
+            importCode: getControlImportPath("workflowTypePicker"),
+            exampleCode: `<WorkflowTypePicker label="Data View" v-model="value" />`
+        };
+    },
+    template: `
+<GalleryAndResult
+    :value="value"
+    :importCode="importCode"
+    :exampleCode="exampleCode"
+    enableReflection
+>
+    <WorkflowTypePicker label="Data Views"
+        v-model="value"
+        :multiple="multiple"
+        :showBlankItem="showBlankItem"
+        :includeInactiveItems="includeInactiveItems" />
+
+    <template #settings>
         <div class="row">
             <div class="col-md-4">
-                <DropDownList label="Display Style" v-model="displayStyle" :items="displayStyleItems" />
+                <CheckBox label="Multiple" v-model="multiple" />
             </div>
             <div class="col-md-4">
-                <NumberUpDown label="Column Count" v-model="columnCount" :min="0" />
-            </div>
-            <div class="col-md-4">
-                <EntityTypePicker label="For Entity Type" v-model="entityTypeGuid" enhanceForLongLists showBlankItem />
+                <CheckBox label="Include Inactive Items" v-model="includeInactiveItems" />
             </div>
         </div>
     </template>
@@ -3358,7 +3384,8 @@ const controlGalleryComponents: Record<string, Component> = [
     binaryFileTypePickerGallery,
     binaryFilePickerGallery,
     modalGallery,
-    dataViewPickerGallery
+    dataViewPickerGallery,
+    workflowTypePickerGallery
 ]
     // Sort list by component name
     .sort((a, b) => a.name.localeCompare(b.name))

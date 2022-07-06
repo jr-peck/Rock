@@ -21,9 +21,9 @@ namespace Rock.ViewModels.Rest.Controls
 {
     /// <summary>
     /// The options that can be passed to the ChildTreeItems API action of
-    /// the DataViewPicker control.
+    /// the WorkflowTypePicker control.
     /// </summary>
-    public class DataViewPickerGetDataViewsOptionsBag
+    public class WorkflowTypePickerGetWorkflowTypesOptionsBag
     {
         /// <summary>
         /// Gets or sets the parent unique identifier whose children are to
@@ -64,6 +64,14 @@ namespace Rock.ViewModels.Rest.Controls
         /// </summary>
         /// <value>The default icon CSS class.</value>
         public string DefaultIconCssClass { get; set; } = "fa fa-list-ol";
+
+        /// <summary>
+        /// Gets or sets a value indicating whether inactive items should be
+        /// included in the results. If the entity type does not support the
+        /// IsActive property then this value will be ignored.
+        /// </summary>
+        /// <value><c>true</c> if inactive items should be included; otherwise, <c>false</c>.</value>
+        public bool IncludeInactiveItems { get; set; }
 
         /// <summary>
         /// Gets or sets the item property value to compare against. This should

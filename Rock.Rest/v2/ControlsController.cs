@@ -1338,6 +1338,43 @@ namespace Rock.Rest.v2
 
         #endregion
 
+        #region Workflow Type Picker
+
+        /// <summary>
+        /// Gets the workflow type items that match the options sent in the request body.
+        /// This endpoint returns items formatted for use in a tree view control.
+        /// </summary>
+        /// <param name="options">The options that describe which workflow types to load.</param>
+        /// <returns>A collection of view models that represent the defined values.</returns>
+        [HttpPost]
+        [System.Web.Http.Route( "WorkflowTypePickerGetWorkflowTypes" )]
+        [Authenticate]
+        [Rock.SystemGuid.RestActionGuid( "622EE929-7A18-46BE-9AEA-9E0725293612" )]
+        public IHttpActionResult WorkflowTypePickerGetWorkflowTypes( [FromBody] WorkflowTypePickerGetWorkflowTypesOptionsBag options )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var clientService = new CategoryClientService( rockContext, GetPerson( rockContext ) );
+                var grant = SecurityGrant.FromToken( options.SecurityGrantToken );
+
+                var items = clientService.GetCategorizedTreeItems( new CategoryItemTreeOptions
+                {
+                    ParentGuid = options.ParentGuid,
+                    GetCategorizedItems = true,
+                    EntityTypeGuid = Rock.SystemGuid.EntityType.WORKFLOW_TYPE.AsGuid(),
+                    IncludeUnnamedEntityItems = true,
+                    IncludeCategoriesWithoutChildren = false,
+                    IncludeInactiveItems = options.IncludeInactiveItems,
+                    LazyLoad = false,
+                    SecurityGrant = grant
+                } );
+
+                return Ok( items );
+            }
+        }
+
+        #endregion
+
         #region Helper Methods
 
         /// <summary>
