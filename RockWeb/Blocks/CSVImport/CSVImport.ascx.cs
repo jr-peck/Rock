@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using CsvHelper;
 using Rock.Data;
 using Rock.Model;
+using Rock.Slingshot;
 using Rock.Web.Cache;
 using Rock.Web.UI.Controls;
 
@@ -147,18 +148,20 @@ namespace RockWeb.Blocks.CVSImport
             if ( !containsAllRequiredFields )
             {
                 var missingRequiredFields = requiredFields.Except( this.propertiesMapping.Keys );
-                nbRequiredFieldsNotPresentWarning.Text = "The following required fields are missing: " + string.Join(", ", missingRequiredFields );
+                nbRequiredFieldsNotPresentWarning.Text = "Not all required fields have been mapped.Please provide mappings for: \n" + string.Join( "\n", missingRequiredFields );
                 nbRequiredFieldsNotPresentWarning.Visible = true;
                 return;
             }
+            var personCSVFileName = this.Request.MapPath( fupCSVFile.UploadedContentFilePath );
+            var slingshotImporter = new SlingshotImporter( personCSVFileName, tbSourceDescription.Text, this.propertiesMapping );
+            slingshotImporter.DoImport();
         }
 
         protected void ddlCSVHeader_SelectedIndexChanged( object sender, EventArgs e )
         {
-            // TODO show warning.
+            // TODO validation and show warning
 
             RockDropDownList rockDropDownList = ( RockDropDownList ) sender;
-            this.propertiesMapping = ( Dictionary<string, string> ) ViewState["PropertiesMapping"] ?? new Dictionary<string, string>();
             if ( propertiesMapping.ContainsKey( rockDropDownList.SelectedValue ) )
             {
                 rockDropDownList.ClearSelection();
@@ -187,7 +190,6 @@ namespace RockWeb.Blocks.CVSImport
 
             ListItem[] requiredFieldslistItems = requiredFields.Select( name => new ListItem( name ) )
                 .ToArray();
-
             foreach ( ListItem listItem in requiredFieldslistItems )
             {
                 listItem.Attributes["OptionGroup"] = FIELD_OPTION_NAME;
@@ -195,7 +197,6 @@ namespace RockWeb.Blocks.CVSImport
 
             ListItem[] optionalFieldslistItems = optionalFields.Select( name => new ListItem( name ) )
                 .ToArray();
-
             foreach ( ListItem listItem in optionalFieldslistItems )
             {
                 listItem.Attributes["OptionGroup"] = FIELD_OPTION_NAME;
