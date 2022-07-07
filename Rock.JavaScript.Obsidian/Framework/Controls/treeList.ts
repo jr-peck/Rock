@@ -301,7 +301,7 @@ export default defineComponent({
             if (props.provider) {
                 getRootItems();
             }
-        }, { deep: true });
+        });
 
         return {
             internalItems,

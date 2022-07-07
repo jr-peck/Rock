@@ -64,8 +64,23 @@ export default defineComponent({
 
         // #region Watchers
 
+        // Keep security token up to date, but don't need refetch data
+        watch(securityGrantToken, () => {
+            itemProvider.value.securityGrantToken = securityGrantToken.value;
+        });
+
+        // When this changes, we need to refetch the data, so reset the whole itemProvider
         watch(() => props.includeInactiveItems, () => {
-            itemProvider.value.includeInactiveItems = props.includeInactiveItems;
+            const oldProvider = itemProvider.value;
+            const newProvider = new WorkflowTypeTreeItemProvider();
+
+            // copy old provider's properties
+            newProvider.securityGrantToken = oldProvider.securityGrantToken;
+            // Use new value
+            newProvider.includeInactiveItems = props.includeInactiveItems;
+
+            // Set the provider to the new one
+            itemProvider.value = newProvider;
         });
 
         watch(internalValue, () => {

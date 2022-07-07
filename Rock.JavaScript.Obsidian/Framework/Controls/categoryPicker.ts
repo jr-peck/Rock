@@ -69,8 +69,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const internalValue = ref(props.modelValue ?? null);
 
-        // Configure the item provider with our settings. These are not reactive
-        // since we don't do lazy loading so there is no point.
+        // Configure the item provider with our settings.
         const itemProvider = ref(new CategoryTreeItemProvider());
         itemProvider.value.rootCategoryGuid = props.rootCategoryGuid;
         itemProvider.value.entityTypeGuid = props.entityTypeGuid;
@@ -78,12 +77,26 @@ export default defineComponent({
         itemProvider.value.entityTypeQualifierValue = props.entityTypeQualifierValue;
         itemProvider.value.securityGrantToken = props.securityGrantToken;
 
+        // Keep security token up to date, but don't need refetch data
         watch(() => props.securityGrantToken, () => {
             itemProvider.value.securityGrantToken = props.securityGrantToken;
         });
 
+        // When this changes, we need to refetch the data, so reset the whole itemProvider
         watch(() => props.entityTypeGuid, () => {
-            itemProvider.value.entityTypeGuid = props.entityTypeGuid;
+            const oldProvider = itemProvider.value;
+            const newProvider = new CategoryTreeItemProvider();
+
+            // copy old provider's properties
+            newProvider.rootCategoryGuid = oldProvider.rootCategoryGuid;
+            newProvider.entityTypeQualifierColumn = oldProvider.entityTypeQualifierColumn;
+            newProvider.entityTypeQualifierValue = oldProvider.entityTypeQualifierValue;
+            newProvider.securityGrantToken = oldProvider.securityGrantToken;
+            // Use new value
+            newProvider.entityTypeGuid = props.entityTypeGuid;
+
+            // Set the provider to the new one
+            itemProvider.value = newProvider;
         });
 
         watch(internalValue, () => {
